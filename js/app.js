@@ -43,7 +43,7 @@ const uranus = createUranus(scene);
 // Линия орбиты для наглядности
 const planets = [earth, venus, neptune, mercury, jupiter, mars, pluto, saturn, uranus];
 planets.forEach(planet => {
-    const planetOrbitGeometry = new THREE.RingGeometry(planet.orbitRadius - 0.1, planet.orbitRadius + 0.0001, 64, 1);
+    const planetOrbitGeometry = new THREE.RingGeometry(planet.orbitRadius - 0.01, planet.orbitRadius + 0.01, 64, 1);
     const planetOrbitMaterial = new THREE.LineBasicMaterial({ color: 0x888888, side: THREE.DoubleSide });
     const planetOrbit = new THREE.Mesh(planetOrbitGeometry, planetOrbitMaterial);
     planetOrbit.rotation.x = Math.PI / 2; // Повернем орбиту в горизонтальную плоскость
@@ -63,10 +63,12 @@ sun.mesh.add(glowMesh); // ⬅️ sun.mesh, не sun
 */
 
 // Анимация
-let time = 0;
+let time = localStorage.getItem('animationTime') ? parseFloat(localStorage.getItem('animationTime')) : 0;
 function animate() {
     requestAnimationFrame(animate);
     time += 0.01;
+
+    localStorage.setItem('animationTime', time);
 
     // Вращение Солнца
     sun.mesh.rotation.y += sun.rotationSpeed;
