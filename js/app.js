@@ -40,12 +40,15 @@ const saturn = createSaturn(scene);
 const uranus = createUranus(scene);
 
 
-// Опционально: Добавим линию орбиты для наглядности
-const orbitGeometry = new THREE.RingGeometry(earth.orbitRadius - 0.1, earth.orbitRadius + 0.0001, 64, 1);
-const orbitMaterial = new THREE.LineBasicMaterial({ color: 0x888888, side: THREE.DoubleSide });
-const orbit = new THREE.Mesh(orbitGeometry, orbitMaterial);
-orbit.rotation.x = Math.PI / 2; // Повернем орбиту в горизонтальную плоскость
-scene.add(orbit);
+// Линия орбиты для наглядности
+const planets = [earth, venus, neptune, mercury, jupiter, mars, pluto, saturn, uranus];
+planets.forEach(planet => {
+    const planetOrbitGeometry = new THREE.RingGeometry(planet.orbitRadius - 0.1, planet.orbitRadius + 0.0001, 64, 1);
+    const planetOrbitMaterial = new THREE.LineBasicMaterial({ color: 0x888888, side: THREE.DoubleSide });
+    const planetOrbit = new THREE.Mesh(planetOrbitGeometry, planetOrbitMaterial);
+    planetOrbit.rotation.x = Math.PI / 2; // Повернем орбиту в горизонтальную плоскость
+    scene.add(planetOrbit);
+});
 
 /* const glowMaterial = new THREE.MeshBasicMaterial({
     color: 0xffa500,
@@ -78,47 +81,39 @@ function animate() {
     // Орбита Луны вокруг Земли
     moon.mesh.position.x = earth.mesh.position.x + Math.cos(time * moon.orbitSpeed) * moon.orbitRadius;
     moon.mesh.position.z = earth.mesh.position.z + Math.sin(time * moon.orbitSpeed) * moon.orbitRadius;
-// Вращение Луны вокруг своей оси
+    // Вращение Луны вокруг своей оси
     moon.mesh.rotation.y += moon.rotationSpeed;
 
     venus.mesh.position.x = Math.cos(time * venus.orbitSpeed) * venus.orbitRadius;
     venus.mesh.position.z = Math.sin(time * venus.orbitSpeed) * venus.orbitRadius;
-
     venus.mesh.rotation.y += venus.rotationSpeed;
 
     neptune.mesh.position.x = Math.cos(time * neptune.orbitSpeed) * neptune.orbitRadius;
     neptune.mesh.position.z = Math.sin(time * neptune.orbitSpeed) * neptune.orbitRadius;
-
     neptune.mesh.rotation.y += neptune.rotationSpeed;
 
     mercury.mesh.position.x = Math.cos(time * mercury.orbitSpeed) * mercury.orbitRadius;
     mercury.mesh.position.z = Math.sin(time * mercury.orbitSpeed) * mercury.orbitRadius;
-
     mercury.mesh.rotation.y += mercury.rotationSpeed;
 
     jupiter.mesh.position.x = Math.cos(time * jupiter.orbitSpeed) * jupiter.orbitRadius;
     jupiter.mesh.position.z = Math.sin(time * jupiter.orbitSpeed) * jupiter.orbitRadius;
-
     jupiter.mesh.rotation.y += jupiter.rotationSpeed;
 
     mars.mesh.position.x = Math.cos(time * mars.orbitSpeed) * mars.orbitRadius;
     mars.mesh.position.z = Math.sin(time * mars.orbitSpeed) * mars.orbitRadius;
-
     mars.mesh.rotation.y += mars.rotationSpeed;
 
     pluto.mesh.position.x = Math.cos(time * pluto.orbitSpeed) * pluto.orbitRadius;
     pluto.mesh.position.z = Math.sin(time * pluto.orbitSpeed) * pluto.orbitRadius;
-
     pluto.mesh.rotation.y += pluto.rotationSpeed;
 
     saturn.mesh.position.x = Math.cos(time * saturn.orbitSpeed) * saturn.orbitRadius;
     saturn.mesh.position.z = Math.sin(time * saturn.orbitSpeed) * saturn.orbitRadius;
-
     saturn.mesh.rotation.y += saturn.rotationSpeed;
 
     uranus.mesh.position.x = Math.cos(time * uranus.orbitSpeed) * uranus.orbitRadius;
     uranus.mesh.position.z = Math.sin(time * uranus.orbitSpeed) * uranus.orbitRadius;
-
     uranus.mesh.rotation.y += uranus.rotationSpeed;
     
     controls.update();

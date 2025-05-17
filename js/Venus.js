@@ -30,7 +30,7 @@ export function createVenus(scene) {
     return {
         mesh: venus,
         orbitRadius: 12,
-        orbitSpeed: 0.3,
+        orbitSpeed: 0.44,
         rotationSpeed: 0.003,
     };
 }
