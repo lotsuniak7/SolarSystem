@@ -1,19 +1,21 @@
+import * as THREE from 'three';
+
 const textureLoader = new THREE.TextureLoader();
 
-export function createEarth(scene) {
+export function createEarth(scene)
+{
     let earthMaterial;
     const earthGeometry = new THREE.SphereGeometry(0.5, 32, 32); // Радиус Земли меньше Солнца
 
     // Временный материал до загрузки текстуры
     earthMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff }); // Синий цвет для теста
     const earth = new THREE.Mesh(earthGeometry, earthMaterial);
-
     // Загрузка текстуры Земли
     textureLoader.load(
         '../textures/earth.jpg',
         (texture) => {
             console.log('Earth texture loaded successfully');
-            earthMaterial = new THREE.MeshStandardMaterial({ map: texture });
+            earthMaterial = new THREE.MeshBasicMaterial({ map: texture });
             earth.material = earthMaterial;
         },
         undefined,
@@ -31,7 +33,7 @@ export function createEarth(scene) {
     return {
         mesh: earth,
         orbitRadius: 16, // Расстояние от Солнца (орбитальный радиус)
-        orbitSpeed: 0.5, // Скорость орбиты (ускоренная для визуального эффекта)
+        orbitSpeed: 0.1, // Скорость орбиты (ускоренная для визуального эффекта)
         rotationSpeed: 0.01 // Скорость вращения Земли вокруг своей оси
     };
 }

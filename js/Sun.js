@@ -1,3 +1,6 @@
+import * as THREE from 'three';
+
+
 const textureLoader = new THREE.TextureLoader();
 
 export function createSun(scene)
@@ -23,12 +26,11 @@ export function createSun(scene)
         }
     );
 
-    // Добавление света
-    const sunLight = new THREE.PointLight(0xffffff, 5.0, 500);
+    const sunLight = new THREE.PointLight(0xffffff, 15.0, 0); // бесконечный радиус
     sunLight.position.set(0, 0, 0);
     scene.add(sunLight);
 
-    const ambientLight = new THREE.AmbientLight(0x808080);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.3); // чуть ярче
     scene.add(ambientLight);
 
     // Добавление Солнца в сцену

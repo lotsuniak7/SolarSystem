@@ -1,6 +1,11 @@
 import { createSun } from './Sun.js';
 import { createEarth } from './Earth.js';
 import {createMoon} from './Moon.js';
+import {createVenus} from './Venus.js';
+import {createNeptune} from "./Neptune";
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import {AdditiveBlending, Mesh, ShaderMaterial, SphereGeometry} from "three";
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -11,16 +16,17 @@ const renderer = new THREE.WebGLRenderer({ canvas: canvas });
 renderer.setSize(window.innerWidth, window.innerHeight);
 
 // Управление камерой
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
 controls.update();
 
-// Создание Солнца
+
+// Creation des obhetc spatiaux
 const sun = createSun(scene);
-
-// Создание Земли
 const earth = createEarth(scene);
-
 const moon = createMoon(scene);
+const venus = createVenus(scene);
+const neptune = createNeptune(scene);
+
 
 // Опционально: Добавим линию орбиты для наглядности
 const orbitGeometry = new THREE.RingGeometry(earth.orbitRadius - 0.1, earth.orbitRadius + 0.0001, 64, 1);
@@ -28,6 +34,18 @@ const orbitMaterial = new THREE.LineBasicMaterial({ color: 0x888888, side: THREE
 const orbit = new THREE.Mesh(orbitGeometry, orbitMaterial);
 orbit.rotation.x = Math.PI / 2; // Повернем орбиту в горизонтальную плоскость
 scene.add(orbit);
+
+/* const glowMaterial = new THREE.MeshBasicMaterial({
+    color: 0xffa500,
+    transparent: true,
+    opacity: 0.4,
+    side: THREE.BackSide
+});
+
+const glowGeometry = new THREE.SphereGeometry(2.5, 32, 32); // чуть больше Солнца
+const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
+sun.mesh.add(glowMesh); // ⬅️ sun.mesh, не sun
+*/
 
 // Анимация
 let time = 0;
@@ -50,6 +68,16 @@ function animate() {
     moon.mesh.position.z = earth.mesh.position.z + Math.sin(time * moon.orbitSpeed) * moon.orbitRadius;
 // Вращение Луны вокруг своей оси
     moon.mesh.rotation.y += moon.rotationSpeed;
+
+    venus.mesh.position.x = Math.cos(time * venus.orbitSpeed) * venus.orbitRadius;
+    venus.mesh.position.z = Math.sin(time * venus.orbitSpeed) * venus.orbitRadius;
+
+    venus.mesh.rotation.y += venus.rotationSpeed;
+
+    neptune.mesh.position.x = Math.cos(time * neptune.orbitSpeed) * neptune.orbitRadius;
+    neptune.mesh.position.z = Math.sin(time * neptune.orbitSpeed) * neptune.orbitRadius;
+
+    neptune.mesh.rotation.y += neptune.rotationSpeed;
     
     controls.update();
     renderer.render(scene, camera);
