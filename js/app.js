@@ -7,6 +7,7 @@ import {createMercury} from "./Mercury";
 import {createJupiter} from "./jupiter";
 import {createMars} from "./Mars";
 import {createPluto} from "./Pluto";
+import {createSaturn} from "./saturn";
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import {AdditiveBlending, Mesh, ShaderMaterial, SphereGeometry} from "three";
@@ -34,6 +35,7 @@ const mercury = createMercury(scene);
 const jupiter = createJupiter(scene);
 const mars = createMars(scene);
 const pluto = createPluto(scene);
+const saturn = createSaturn(scene);
 
 
 // Опционально: Добавим линию орбиты для наглядности
@@ -106,6 +108,11 @@ function animate() {
     pluto.mesh.position.z = Math.sin(time * pluto.orbitSpeed) * pluto.orbitRadius;
 
     pluto.mesh.rotation.y += pluto.rotationSpeed;
+
+    saturn.mesh.position.x = Math.cos(time * saturn.orbitSpeed) * saturn.orbitRadius;
+    saturn.mesh.position.z = Math.sin(time * saturn.orbitSpeed) * saturn.orbitRadius;
+
+    saturn.mesh.rotation.y += saturn.rotationSpeed;
     
     controls.update();
     renderer.render(scene, camera);
