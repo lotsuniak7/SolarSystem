@@ -29,6 +29,8 @@ camera.lookAt(0, 0, 0);
 const canvas = document.querySelector('canvas');
 const renderer = new THREE.WebGLRenderer({ canvas: canvas });
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true; // Включаем тени
+renderer.shadowMap.type = 2; // Мягкие тени
 
 // Управление камерой
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -129,6 +131,14 @@ function animate() {
     earth.mesh.rotation.y += earth.rotationSpeed;
     earth.mesh.position.x = Math.cos(time * earth.orbitSpeed) * earth.orbitRadius;
     earth.mesh.position.z = Math.sin(time * earth.orbitSpeed) * earth.orbitRadius;
+
+    sun.light.target.position.copy(earth.mesh.position);
+    sun.light.target.updateMatrixWorld();
+
+    // НОВЫЙ КОД: Обновляем позицию DirectionalLight относительно каждой планеты
+    /*if (sun.light) {
+        sun.light.position.copy(sun.mesh.position);
+    }*/
 
     moon.mesh.position.x = earth.mesh.position.x + Math.cos(time * moon.orbitSpeed) * moon.orbitRadius;
     moon.mesh.position.z = earth.mesh.position.z + Math.sin(time * moon.orbitSpeed) * moon.orbitRadius;
