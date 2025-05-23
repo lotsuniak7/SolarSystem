@@ -1,43 +1,37 @@
-import { createSun } from './Sun.js';
-import { createEarth} from './planets-moon/Earth.js';
-import {createMoon} from './planets-moon/Moon.js';
-import {createVenus} from './planets-moon/Venus.js';
-import {createNeptune} from "./planets-moon/Neptune";
-import {createMercury} from "./planets-moon/Mercury";
-import {createJupiter} from "./planets-moon/jupiter";
-import {createMars} from "./planets-moon/Mars";
-import {createPluto} from "./planets-moon/Pluto";
-import {createSaturn} from "./planets-moon/saturn";
-import {createUranus} from "./planets-moon/Uranus";
-import {createStars} from "./Stars";
-import {initSound} from "./sound";
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import {initScene} from "./initScene";
+import {initClickHandler} from "./clickHandler";
+import { createSun } from './space/Sun.js';
+import { createEarth} from './space/Earth.js';
+import {createMoon} from './space/Moon.js';
+import {createVenus} from './space/Venus.js';
+import {createNeptune} from "./space/Neptune";
+import {createMercury} from "./space/Mercury";
+import {createJupiter} from "./space/jupiter";
+import {createMars} from "./space/Mars";
+import {createPluto} from "./space/Pluto";
+import {createSaturn} from "./space/saturn";
+import {createUranus} from "./space/Uranus";
+import {createOrbits} from "./space/orbits";
+import {createStars} from "./space/Stars";
+import {initSound} from "./sound";
+import {initAnimation} from "./animation";
 import {AdditiveBlending, Mesh, ShaderMaterial, SphereGeometry} from "three";
 import {lights, objectRadius} from "three/tsl";
 
-const scene = new THREE.Scene();
+
+// Initialisation de la scene, de la caméra, du rendu et des contrôles
+const { scene, camera, renderer, controls } = initScene();
+
+// l'Ajout des etoiles
 createStars(scene);
 
+// Musique
 const soundControls = initSound();
 soundControls.setSpaceVolume(0.4);
 
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1300);
-camera.position.set(0, 30, 50); // Увеличим расстояние для охвата орбиты
-camera.lookAt(0, 0, 0);
 
-const canvas = document.querySelector('canvas');
-const renderer = new THREE.WebGLRenderer({ canvas: canvas });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.shadowMap.enabled = true; // Включаем тени
-renderer.shadowMap.type = 2; // Мягкие тени
-
-// Управление камерой
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.update();
-
-
-// Creation des obhetc spatiaux
+// Creation des objets spatiaux
 const sun = createSun(scene);
 const earth = createEarth(scene);
 const moon = createMoon(scene);
@@ -52,7 +46,7 @@ const uranus = createUranus(scene);
 
 
 const celestialObjects = [
-   // sun.mesh,
+    sun.mesh,
     earth.mesh,
     moon.mesh,
     venus.mesh,
@@ -66,167 +60,12 @@ const celestialObjects = [
 ];
 
 
-// Линия орбиты для наглядности
+// La ligne d'orbite || Линия орбиты для наглядности
 const planets = [earth, venus, neptune, mercury, jupiter, mars, pluto, saturn, uranus];
-planets.forEach(planet => {
-    const planetOrbitGeometry = new THREE.RingGeometry(planet.orbitRadius - 0.01, planet.orbitRadius + 0.01, 64, 1);
-    const planetOrbitMaterial = new THREE.LineBasicMaterial({ color: 0x888888, side: THREE.DoubleSide });
-    const planetOrbit = new THREE.Mesh(planetOrbitGeometry, planetOrbitMaterial);
-    planetOrbit.rotation.x = Math.PI / 2; // Повернем орбиту в горизонтальную плоскость
-    scene.add(planetOrbit);
-});
+createOrbits(planets, scene);
 
-/* const glowMaterial = new THREE.MeshBasicMaterial({
-    color: 0xffa500,
-    transparent: true,
-    opacity: 0.4,
-    side: THREE.BackSide
-});
+// Initialisation du traitement des clics || Инициализация обработки кликов
+const clickHandler = initClickHandler(celestialObjects, camera, scene, controls);
 
-const glowGeometry = new THREE.SphereGeometry(2.5, 32, 32); // чуть больше Солнца
-const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
-sun.mesh.add(glowMesh); // ⬅️ sun.mesh, не sun
-*/
-
-
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
-let selectedObject = null; // Выбранная планета
-let isFollowingPlanet = false; // Режим слежения
-const initialCameraPosition = new THREE.Vector3(0, 30, 50); // Сохраняем начальную позицию
-const initialCameraTarget = new THREE.Vector3(0, 0, 0); // Сохраняем начальную цель
-
-window.addEventListener('click', (event) => {
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-    raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(celestialObjects, true);
-
-    if (intersects.length > 0) {
-        // Находим родительскую группу или сам объект
-        let targetObject = intersects[0].object;
-
-        // Если кликнули на дочерний объект группы, поднимаемся к родителю
-        while (targetObject.parent && targetObject.parent.type === 'Group' && targetObject.parent !== scene) {
-            targetObject = targetObject.parent;
-        }
-
-        selectedObject = targetObject;
-        isFollowingPlanet = true;
-        controls.enabled = false;
-
-        console.log('Selected object:', selectedObject);
-        console.log('Object position:', selectedObject.position);
-
-    } else if (isFollowingPlanet) {
-        // Клик по пустому месту
-        isFollowingPlanet = false;
-        selectedObject = null;
-        controls.enabled = true; // Включаем OrbitControls
-    }
-});
-
-
-// Анимация
-let time = localStorage.getItem('animationTime') ? parseFloat(localStorage.getItem('animationTime')) : 0;
-function animate() {
-    requestAnimationFrame(animate);
-    time += 0.01;
-
-    localStorage.setItem('animationTime', time);
-
-    // Вращение и орбиты (без изменений)
-    sun.mesh.rotation.y += sun.rotationSpeed;
-
-    earth.mesh.rotation.y += earth.rotationSpeed;
-    earth.mesh.position.x = Math.cos(time * earth.orbitSpeed) * earth.orbitRadius;
-    earth.mesh.position.z = Math.sin(time * earth.orbitSpeed) * earth.orbitRadius;
-
-    moon.mesh.position.x = earth.mesh.position.x + Math.cos(time * moon.orbitSpeed) * moon.orbitRadius;
-    moon.mesh.position.z = earth.mesh.position.z + Math.sin(time * moon.orbitSpeed) * moon.orbitRadius;
-    moon.mesh.rotation.y += moon.rotationSpeed;
-
-    venus.mesh.position.x = Math.cos(time * venus.orbitSpeed) * venus.orbitRadius;
-    venus.mesh.position.z = Math.sin(time * venus.orbitSpeed) * venus.orbitRadius;
-    venus.mesh.rotation.y += venus.rotationSpeed;
-
-    neptune.mesh.position.x = Math.cos(time * neptune.orbitSpeed) * neptune.orbitRadius;
-    neptune.mesh.position.z = Math.sin(time * neptune.orbitSpeed) * neptune.orbitRadius;
-    neptune.mesh.rotation.y += neptune.rotationSpeed;
-
-    mercury.mesh.position.x = Math.cos(time * mercury.orbitSpeed) * mercury.orbitRadius;
-    mercury.mesh.position.z = Math.sin(time * mercury.orbitSpeed) * mercury.orbitRadius;
-    mercury.mesh.rotation.y += mercury.rotationSpeed;
-
-    jupiter.mesh.position.x = Math.cos(time * jupiter.orbitSpeed) * jupiter.orbitRadius;
-    jupiter.mesh.position.z = Math.sin(time * jupiter.orbitSpeed) * jupiter.orbitRadius;
-    jupiter.mesh.rotation.y += jupiter.rotationSpeed;
-
-    mars.mesh.position.x = Math.cos(time * mars.orbitSpeed) * mars.orbitRadius;
-    mars.mesh.position.z = Math.sin(time * mars.orbitSpeed) * mars.orbitRadius;
-    mars.mesh.rotation.y += mars.rotationSpeed;
-
-    pluto.mesh.position.x = Math.cos(time * pluto.orbitSpeed) * pluto.orbitRadius;
-    pluto.mesh.position.z = Math.sin(time * pluto.orbitSpeed) * pluto.orbitRadius;
-    pluto.mesh.rotation.y += pluto.rotationSpeed;
-
-    saturn.mesh.position.x = Math.cos(time * saturn.orbitSpeed) * saturn.orbitRadius;
-    saturn.mesh.position.z = Math.sin(time * saturn.orbitSpeed) * saturn.orbitRadius;
-    saturn.mesh.rotation.y += saturn.rotationSpeed;
-
-    uranus.mesh.position.x = Math.cos(time * uranus.orbitSpeed) * uranus.orbitRadius;
-    uranus.mesh.position.z = Math.sin(time * uranus.orbitSpeed) * uranus.orbitRadius;
-    uranus.mesh.rotation.y += uranus.rotationSpeed;
-
-    // Управление звуком
-    const distanceToSun = camera.position.distanceTo(sun.mesh.position);
-    const proximityThreshold = 10;
-    soundControls.toggleSun(distanceToSun < proximityThreshold);
-
-    // Управление камерой
-    if (isFollowingPlanet && selectedObject) {
-        // Получаем мировую позицию объекта
-        const worldPosition = new THREE.Vector3();
-        selectedObject.getWorldPosition(worldPosition);
-
-        // Определяем размер объекта для правильного смещения
-        let objectSize = 1; // значение по умолчанию
-
-        // Для группы Земли используем размер основной сферы
-        if (selectedObject.userData && selectedObject.userData.name === 'earth') {
-            objectSize = 0.5; // радиус Земли
-        } else if (selectedObject.geometry && selectedObject.geometry.parameters) {
-            objectSize = selectedObject.geometry.parameters.radius || 1;
-        }
-
-        // Смещение камеры
-        const offset = new THREE.Vector3(
-            objectSize * 4,     // Вправо
-            objectSize * 2,     // Вверх (изменено с -1.5 на 2)
-            objectSize * 6      // Отдаление
-        );
-
-        // Целевая позиция камеры
-        const targetPosition = new THREE.Vector3().copy(worldPosition).add(offset);
-
-        // Плавное перемещение камеры
-        camera.position.lerp(targetPosition, 0.05); // Уменьшил скорость для плавности
-
-        // Камера смотрит на объект
-        camera.lookAt(worldPosition);
-    } else {
-        controls.enabled = true;
-        controls.update();
-    }
-
-    renderer.render(scene, camera);
-}
-animate();
-
-// Обработка изменения размера окна
-window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-});
+// Initialisation de l'animation
+initAnimation(sun, earth, moon, venus, neptune, mercury, jupiter, mars, pluto, saturn, uranus, camera, renderer, soundControls, clickHandler, scene);
