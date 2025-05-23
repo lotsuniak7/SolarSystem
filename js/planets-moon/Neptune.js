@@ -7,14 +7,17 @@ export function createNeptune(scene)
     let neptuneMaterial;
     const neptuneGeometry = new THREE.SphereGeometry(0.7, 32, 32);
 
-    neptuneMaterial = new THREE.MeshBasicMaterial({ color: 0x000080});
+    neptuneMaterial = new THREE.MeshPhongMaterial({ color: 0x000080});
     const neptune = new THREE.Mesh(neptuneGeometry, neptuneMaterial);
+
+    neptune.castShadow = true;
+    neptune.needsUpdate = true;
 
     textureLoader.load(
         './textures/neptune.jpg',
         (texture) => {
             console.log('Neptune loaded');
-            neptuneMaterial = new THREE.MeshBasicMaterial({ map: texture });
+            neptuneMaterial = new THREE.MeshPhongMaterial({ map: texture });
             neptune.material = neptuneMaterial;
         },
         undefined,

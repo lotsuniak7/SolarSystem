@@ -8,14 +8,16 @@ export function createMars(scene)
     const marsGeometry = new THREE.SphereGeometry(0.4, 32, 32);
 
     // Временный материал до загрузки текстуры
-    marsMaterial = new THREE.MeshBasicMaterial({ color: 0xFF4500 });
+    marsMaterial = new THREE.MeshLambertMaterial({ color: 0xFF4500 });
     const mars = new THREE.Mesh(marsGeometry, marsMaterial);
+
+
 
     textureLoader.load(
         '../textures/mars.jpg',
         (texture) => {
             console.log('mars texture loaded successfully');
-            marsMaterial = new THREE.MeshBasicMaterial({ map: texture });
+            marsMaterial = new THREE.MeshLambertMaterial({ map: texture });
             mars.material = marsMaterial;
         },
         undefined,

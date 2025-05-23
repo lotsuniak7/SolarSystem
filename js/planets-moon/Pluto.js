@@ -8,14 +8,17 @@ export function createPluto(scene)
     const plutoGeometry = new THREE.SphereGeometry(0.15, 32, 32);
 
     // Временный материал до загрузки текстуры
-    plutoMaterial = new THREE.MeshBasicMaterial({ color: 0x8A2BE2 });
+    plutoMaterial = new THREE.MeshPhongMaterial({ color: 0x8A2BE2 });
     const pluto = new THREE.Mesh(plutoGeometry, plutoMaterial);
+
+    pluto.castShadow = true;
+    pluto.needsUpdate = true;
 
     textureLoader.load(
         '../textures/pluto.jpg',
         (texture) => {
             console.log('pluto texture loaded successfully');
-            plutoMaterial = new THREE.MeshBasicMaterial({ map: texture });
+            plutoMaterial = new THREE.MeshPhongMaterial({ map: texture });
             pluto.material = plutoMaterial;
         },
         undefined,

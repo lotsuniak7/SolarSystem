@@ -8,14 +8,17 @@ export function createJupiter(scene)
     const jupiterGeometry = new THREE.SphereGeometry(1.2, 32, 32); // Радиус Земли меньше Солнца
 
     // Временный материал до загрузки текстуры
-    jupiterMaterial = new THREE.MeshBasicMaterial({ color: 0xDAA520 });
+    jupiterMaterial = new THREE.MeshPhongMaterial({ color: 0xDAA520 });
     const jupiter = new THREE.Mesh(jupiterGeometry, jupiterMaterial);
+
+    jupiter.castShadow = true;
+    jupiter.needsUpdate = true;
 
     textureLoader.load(
         '../textures/jupiter.jpg',
         (texture) => {
             console.log('jupiter texture loaded successfully');
-            jupiterMaterial = new THREE.MeshBasicMaterial({ map: texture });
+            jupiterMaterial = new THREE.MeshPhongMaterial({ map: texture });
             jupiter.material = jupiterMaterial;
         },
         undefined,

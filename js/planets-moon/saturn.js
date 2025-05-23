@@ -8,14 +8,17 @@ export function createSaturn(scene)
     const saturnGeometry = new THREE.SphereGeometry(1, 32, 32);
 
     // Временный материал до загрузки текстуры
-    saturnMaterial = new THREE.MeshBasicMaterial({ color: 0xF4A460 });
+    saturnMaterial = new THREE.MeshPhongMaterial({ color: 0xF4A460 });
     const saturn = new THREE.Mesh(saturnGeometry, saturnMaterial);
+
+    saturn.castShadow = true;
+    saturn.needsUpdate = true;
 
     textureLoader.load(
         '../textures/saturn.jpg',
         (texture) => {
             console.log('saturn texture loaded successfully');
-            saturnMaterial = new THREE.MeshBasicMaterial({ map: texture });
+            saturnMaterial = new THREE.MeshPhongMaterial({ map: texture });
             saturn.material = saturnMaterial;
         },
         undefined,
@@ -26,14 +29,17 @@ export function createSaturn(scene)
 
     // Creation des Rings of Saturn
     const ringsGeometry = new THREE.RingGeometry(1.2, 2.0, 64);
-    let ringsMaterial = new THREE.MeshBasicMaterial({ color: 0xD3D3D3, side: THREE.DoubleSide });
+    let ringsMaterial = new THREE.MeshPhongMaterial({ color: 0xD3D3D3, side: THREE.DoubleSide });
     const rings = new THREE.Mesh(ringsGeometry, ringsMaterial);
+
+    rings.castShadow = true;
+    rings.needsUpdate = true;
 
     textureLoader.load(
         '../textures/saturn_ring.png',
         (texture) => {
             console.log('Saturn rings texture loaded successfully');
-            ringsMaterial = new THREE.MeshStandardMaterial({ map: texture, side: THREE.DoubleSide });
+            ringsMaterial = new THREE.MeshPhongMaterial({ map: texture, side: THREE.DoubleSide });
             rings.material = ringsMaterial;
         },
         undefined,

@@ -8,14 +8,17 @@ export function createMercury(scene)
     const mercuryGeometry = new THREE.SphereGeometry(0.3, 32, 32);
 
     // Временный материал до загрузки текстуры
-    mercuryMaterial = new THREE.MeshBasicMaterial({ color: 0x808080 });
+    mercuryMaterial = new THREE.MeshPhongMaterial({ color: 0x808080 });
     const mercury = new THREE.Mesh(mercuryGeometry, mercuryMaterial);
+
+    mercury.castShadow = true;
+    mercury.needsUpdate = true;
 
     textureLoader.load(
         '../textures/mercury.jpg',
         (texture) => {
             console.log('Mercury texture loaded successfully');
-            mercuryMaterial = new THREE.MeshBasicMaterial({ map: texture });
+            mercuryMaterial = new THREE.MeshPhongMaterial({ map: texture });
             mercury.material = mercuryMaterial;
         },
         undefined,

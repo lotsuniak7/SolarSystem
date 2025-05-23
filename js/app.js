@@ -1,20 +1,20 @@
 import { createSun } from './Sun.js';
-import { createEarth } from './Earth.js';
-import {createMoon} from './Moon.js';
-import {createVenus} from './Venus.js';
-import {createNeptune} from "./Neptune";
-import {createMercury} from "./Mercury";
-import {createJupiter} from "./jupiter";
-import {createMars} from "./Mars";
-import {createPluto} from "./Pluto";
-import {createSaturn} from "./saturn";
-import {createUranus} from "./Uranus";
+import { createEarth} from './planets-moon/Earth.js';
+import {createMoon} from './planets-moon/Moon.js';
+import {createVenus} from './planets-moon/Venus.js';
+import {createNeptune} from "./planets-moon/Neptune";
+import {createMercury} from "./planets-moon/Mercury";
+import {createJupiter} from "./planets-moon/jupiter";
+import {createMars} from "./planets-moon/Mars";
+import {createPluto} from "./planets-moon/Pluto";
+import {createSaturn} from "./planets-moon/saturn";
+import {createUranus} from "./planets-moon/Uranus";
 import {createStars} from "./Stars";
 import {initSound} from "./sound";
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import {AdditiveBlending, Mesh, ShaderMaterial, SphereGeometry} from "three";
-import {objectRadius} from "three/tsl";
+import {lights, objectRadius} from "three/tsl";
 
 const scene = new THREE.Scene();
 createStars(scene);
@@ -52,7 +52,7 @@ const uranus = createUranus(scene);
 
 
 const celestialObjects = [
-    sun.mesh,
+   // sun.mesh,
     earth.mesh,
     moon.mesh,
     venus.mesh,
@@ -101,13 +101,24 @@ window.addEventListener('click', (event) => {
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
     raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(celestialObjects);
+    const intersects = raycaster.intersectObjects(celestialObjects, true);
 
     if (intersects.length > 0) {
-        // Клик по планете
-        selectedObject = intersects[0].object;
+        // Находим родительскую группу или сам объект
+        let targetObject = intersects[0].object;
+
+        // Если кликнули на дочерний объект группы, поднимаемся к родителю
+        while (targetObject.parent && targetObject.parent.type === 'Group' && targetObject.parent !== scene) {
+            targetObject = targetObject.parent;
+        }
+
+        selectedObject = targetObject;
         isFollowingPlanet = true;
-        controls.enabled = false; // Отключаем OrbitControls
+        controls.enabled = false;
+
+        console.log('Selected object:', selectedObject);
+        console.log('Object position:', selectedObject.position);
+
     } else if (isFollowingPlanet) {
         // Клик по пустому месту
         isFollowingPlanet = false;
@@ -131,14 +142,6 @@ function animate() {
     earth.mesh.rotation.y += earth.rotationSpeed;
     earth.mesh.position.x = Math.cos(time * earth.orbitSpeed) * earth.orbitRadius;
     earth.mesh.position.z = Math.sin(time * earth.orbitSpeed) * earth.orbitRadius;
-
-    sun.light.target.position.copy(earth.mesh.position);
-    sun.light.target.updateMatrixWorld();
-
-    // НОВЫЙ КОД: Обновляем позицию DirectionalLight относительно каждой планеты
-    /*if (sun.light) {
-        sun.light.position.copy(sun.mesh.position);
-    }*/
 
     moon.mesh.position.x = earth.mesh.position.x + Math.cos(time * moon.orbitSpeed) * moon.orbitRadius;
     moon.mesh.position.z = earth.mesh.position.z + Math.sin(time * moon.orbitSpeed) * moon.orbitRadius;
@@ -183,25 +186,36 @@ function animate() {
 
     // Управление камерой
     if (isFollowingPlanet && selectedObject) {
-        // Радиус планеты
-        const planetRadius = selectedObject.geometry.parameters.radius || 1;
-        // Смещение камеры для позиционирования планеты в правом нижнем углу
+        // Получаем мировую позицию объекта
+        const worldPosition = new THREE.Vector3();
+        selectedObject.getWorldPosition(worldPosition);
+
+        // Определяем размер объекта для правильного смещения
+        let objectSize = 1; // значение по умолчанию
+
+        // Для группы Земли используем размер основной сферы
+        if (selectedObject.userData && selectedObject.userData.name === 'earth') {
+            objectSize = 0.5; // радиус Земли
+        } else if (selectedObject.geometry && selectedObject.geometry.parameters) {
+            objectSize = selectedObject.geometry.parameters.radius || 1;
+        }
+
+        // Смещение камеры
         const offset = new THREE.Vector3(
-            planetRadius * 2,   // Вправо
-            -planetRadius * 1.5, // Вниз
-            planetRadius * 4    // Отдаление
+            objectSize * 4,     // Вправо
+            objectSize * 2,     // Вверх (изменено с -1.5 на 2)
+            objectSize * 6      // Отдаление
         );
 
         // Целевая позиция камеры
-        const targetPosition = new THREE.Vector3().copy(selectedObject.position).add(offset);
+        const targetPosition = new THREE.Vector3().copy(worldPosition).add(offset);
 
         // Плавное перемещение камеры
-        camera.position.lerp(targetPosition, 0.1);
+        camera.position.lerp(targetPosition, 0.05); // Уменьшил скорость для плавности
 
-        // Камера смотрит на планету
-        camera.lookAt(selectedObject.position);
+        // Камера смотрит на объект
+        camera.lookAt(worldPosition);
     } else {
-        // Свободное управление камерой через OrbitControls
         controls.enabled = true;
         controls.update();
     }

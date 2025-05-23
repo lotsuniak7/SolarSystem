@@ -8,14 +8,17 @@ export function createUranus(scene)
     const uranusGeometry = new THREE.SphereGeometry(0.9, 32, 32);
 
     // Временный материал до загрузки текстуры
-    uranusMaterial = new THREE.MeshBasicMaterial({ color: 0x87CEEB });
+    uranusMaterial = new THREE.MeshPhongMaterial({ color: 0x87CEEB });
     const uranus = new THREE.Mesh(uranusGeometry, uranusMaterial);
+
+    uranus.castShadow = true;
+    uranus.needsUpdate = true;
 
     textureLoader.load(
         '../textures/uranus.jpg',
         (texture) => {
             console.log('uranus texture loaded successfully');
-            uranusMaterial = new THREE.MeshBasicMaterial({ map: texture });
+            uranusMaterial = new THREE.MeshPhongMaterial({ map: texture });
             uranus.material = uranusMaterial;
         },
         undefined,
@@ -26,14 +29,17 @@ export function createUranus(scene)
 
     // Creation des Rings of uranus
     const ringsGeometry = new THREE.RingGeometry(1.0, 1.6, 64);
-    let ringsMaterial = new THREE.MeshBasicMaterial({ color: 0xC0C0C0, side: THREE.DoubleSide });
+    let ringsMaterial = new THREE.MeshPhongMaterial({ color: 0xC0C0C0, side: THREE.DoubleSide });
     const rings = new THREE.Mesh(ringsGeometry, ringsMaterial);
+
+    rings.castShadow = true;
+    rings.needsUpdate = true;
 
     textureLoader.load(
         '../textures/uranus_ring.png',
         (texture) => {
             console.log('uranus rings texture loaded successfully');
-            ringsMaterial = new THREE.MeshStandardMaterial({ map: texture, side: THREE.DoubleSide });
+            ringsMaterial = new THREE.MeshPhongMaterial({ map: texture, side: THREE.DoubleSide });
             rings.material = ringsMaterial;
         },
         undefined,

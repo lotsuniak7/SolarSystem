@@ -28,28 +28,15 @@ export function createSun(scene)
     );
 
     // Настройка освещения с тенями
-    const sunLight = new THREE.DirectionalLight(0xffffff, 3, 100);
-    sunLight.position.set(10, 10, 10); // Позиционируем свет подальше от центра
-    sunLight.target.position.set(0, 0, 0); // Направляем на центр (Солнце)
+    const sunLight = new THREE.PointLight(0xffffff, 1000);
+    sunLight.position.set(0, 0, 0); // Позиционируем свет подальше от центра
 
-    // Включаем тени для света
-    sunLight.castShadow = true;
-
-    // Настройки карты теней
-    sunLight.shadow.mapSize.width = 2048;
-    sunLight.shadow.mapSize.height = 2048;
-    sunLight.shadow.camera.near = 0.1;
-    sunLight.shadow.camera.far = 200;
-    sunLight.shadow.camera.left = -100;
-    sunLight.shadow.camera.right = 100;
-    sunLight.shadow.camera.top = 100;
-    sunLight.shadow.camera.bottom = -100;
 
     scene.add(sunLight);
     scene.add(sunLight.target);
 
     // Увеличиваем ambient light чтобы планеты не были совсем черными
-    const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
+    const ambientLight = new THREE.AmbientLight(0x404040, 0.8);
     scene.add(ambientLight);
 
     // Добавление Солнца в сцену
