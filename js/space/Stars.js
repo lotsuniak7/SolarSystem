@@ -30,11 +30,11 @@ export function createStars(scene)
 
     starsGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
-    const starMaterial = new THREE.PointsMaterial({
+    /*const starMaterial = new THREE.PointsMaterial({
         color: 0xffffff,
         size: 1.5,
         sizeAttenuation: true
-    });
+    });*/
 
     const pointStars = new THREE.Points(starsGeometry, starsMaterial);
     scene.add(pointStars);

@@ -57,7 +57,7 @@ export function createUranus(scene)
 
     return {
         mesh: uranus,
-        orbitRadius: 34, // Расстояние от Солнца (орбитальный радиус)
+        orbitRadius: 85, // Расстояние от Солнца (орбитальный радиус)
         orbitSpeed: 0.0012, // Скорость орбиты (ускоренная для визуального эффекта)
         rotationSpeed: 0.009 // Скорость вращения вокруг своей оси
     };

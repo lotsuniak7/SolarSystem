@@ -5,7 +5,7 @@ const textureLoader = new THREE.TextureLoader();
 export function createPluto(scene)
 {
     let plutoMaterial;
-    const plutoGeometry = new THREE.SphereGeometry(0.15, 32, 32);
+    const plutoGeometry = new THREE.SphereGeometry(0.25, 32, 32);
 
     // Временный материал до загрузки текстуры
     plutoMaterial = new THREE.MeshPhongMaterial({ color: 0x8A2BE2 });
@@ -33,7 +33,7 @@ export function createPluto(scene)
 
     return {
         mesh: pluto,
-        orbitRadius: 40, // Расстояние от Солнца (орбитальный радиус)
+        orbitRadius: 100, // Расстояние от Солнца (орбитальный радиус)
         orbitSpeed: 0.00041, // Скорость орбиты (ускоренная для визуального эффекта)
         rotationSpeed: 0.004 // Скорость вращения вокруг своей оси
     };

@@ -7,8 +7,8 @@ export function initClickHandler(celestialObjects, camera, scene, controls)
     const mouse = new THREE.Vector2();
     let selectedObject = null; // Planète choisie
     let isFollowingPlanet = false; // Режим слежения
-    const initialCameraPosition = new THREE.Vector3(0, 30, 50); // on sauvegarde la position initial
-    const initialCameraTarget = new THREE.Vector3(0, 0, 0); // Сохраняем начальную цель
+    // const initialCameraPosition = new THREE.Vector3(0, 30, 50); // on sauvegarde la position initial
+    // const initialCameraTarget = new THREE.Vector3(0, 0, 0); // Сохраняем начальную цель
 
     window.addEventListener('click', (event) => {
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -42,8 +42,8 @@ export function initClickHandler(celestialObjects, camera, scene, controls)
     });
 
     return {
-        getSelectedObject: () => selectedObject,
-        getIsFollowingPlanet: () => isFollowingPlanet,
+        // getSelectedObject: () => selectedObject,
+        // getIsFollowingPlanet: () => isFollowingPlanet,
         updateCamera: (camera) => {
             if (isFollowingPlanet && selectedObject) {
                 // Получаем мировую позицию объекта

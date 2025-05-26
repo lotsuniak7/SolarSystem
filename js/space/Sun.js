@@ -5,7 +5,7 @@ const textureLoader = new THREE.TextureLoader();
 export function createSun(scene)
 {
     let sunMaterial;
-    const sunGeometry = new THREE.SphereGeometry(2, 32, 32);
+    const sunGeometry = new THREE.SphereGeometry(5, 32, 32);
 
     // Временный материал до загрузки текстуры
     sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
@@ -28,7 +28,7 @@ export function createSun(scene)
     );
 
     // Настройка освещения с тенями
-    const sunLight = new THREE.PointLight(0xffffff, 1000);
+    const sunLight = new THREE.PointLight(0xffffff, 4000);
     sunLight.position.set(0, 0, 0); // Позиционируем свет подальше от центра
 
 
@@ -36,7 +36,7 @@ export function createSun(scene)
     scene.add(sunLight.target);
 
     // Увеличиваем ambient light чтобы планеты не были совсем черными
-    const ambientLight = new THREE.AmbientLight(0x404040, 0.8);
+    const ambientLight = new THREE.AmbientLight(0x404040, 0.1);
     scene.add(ambientLight);
 
     // Добавление Солнца в сцену

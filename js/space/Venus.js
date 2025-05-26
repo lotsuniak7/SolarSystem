@@ -4,7 +4,7 @@ const textureLoader = new THREE.TextureLoader();
 
 export function createVenus(scene) {
     let venusMaterial;
-    const venusGeometry = new THREE.SphereGeometry(0.6, 32, 32)
+    const venusGeometry = new THREE.SphereGeometry(1.2, 32, 32)
 
     venusMaterial = new THREE.MeshPhongMaterial({ color: 0xffa500 });
     const venus = new THREE.Mesh(venusGeometry, venusMaterial);
@@ -32,7 +32,7 @@ export function createVenus(scene) {
 
     return {
         mesh: venus,
-        orbitRadius: 12,
+        orbitRadius: 30,
         orbitSpeed: 0.44,
         rotationSpeed: 0.003,
     };

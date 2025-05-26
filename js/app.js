@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+// import * as THREE from 'three';
 import {initScene} from "./initScene";
 import {initClickHandler} from "./clickHandler";
 import { createSun } from './space/Sun.js';
@@ -16,8 +16,8 @@ import {createOrbits} from "./space/orbits";
 import {createStars} from "./space/Stars";
 import {initSound} from "./sound";
 import {initAnimation} from "./animation";
-import {AdditiveBlending, Mesh, ShaderMaterial, SphereGeometry} from "three";
-import {lights, objectRadius} from "three/tsl";
+// import {AdditiveBlending, Mesh, ShaderMaterial, SphereGeometry} from "three";
+// import {lights, objectRadius} from "three/tsl";
 
 
 // Initialisation de la scene, de la caméra, du rendu et des contrôles

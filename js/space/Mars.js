@@ -5,7 +5,7 @@ const textureLoader = new THREE.TextureLoader();
 export function createMars(scene)
 {
     let marsMaterial;
-    const marsGeometry = new THREE.SphereGeometry(0.4, 32, 32);
+    const marsGeometry = new THREE.SphereGeometry(0.675, 32, 32);
 
     // Временный материал до загрузки текстуры
     marsMaterial = new THREE.MeshLambertMaterial({ color: 0xFF4500 });
@@ -32,7 +32,7 @@ export function createMars(scene)
 
     return {
         mesh: mars,
-        orbitRadius: 18, // Расстояние от Солнца (орбитальный радиус)
+        orbitRadius: 45, // Расстояние от Солнца (орбитальный радиус)
         orbitSpeed: 0.053, // Скорость орбиты (ускоренная для визуального эффекта)
         rotationSpeed: 0.01 // Скорость вращения вокруг своей оси
     };

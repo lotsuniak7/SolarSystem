@@ -5,7 +5,7 @@ const textureLoader = new THREE.TextureLoader();
 export function createMercury(scene)
 {
     let mercuryMaterial;
-    const mercuryGeometry = new THREE.SphereGeometry(0.3, 32, 32);
+    const mercuryGeometry = new THREE.SphereGeometry(1.0, 32, 32);
 
     // Временный материал до загрузки текстуры
     mercuryMaterial = new THREE.MeshPhongMaterial({ color: 0x808080 });
@@ -33,7 +33,7 @@ export function createMercury(scene)
 
     return {
         mesh: mercury,
-        orbitRadius: 8, // Расстояние от Солнца (орбитальный радиус)
+        orbitRadius: 20, // Расстояние от Солнца (орбитальный радиус)
         orbitSpeed: 1.12, // Скорость орбиты (ускоренная для визуального эффекта)
         rotationSpeed: 0.002 // Скорость вращения вокруг своей оси
     };

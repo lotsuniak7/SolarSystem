@@ -5,7 +5,7 @@ const textureLoader = new THREE.TextureLoader();
 export function createNeptune(scene)
 {
     let neptuneMaterial;
-    const neptuneGeometry = new THREE.SphereGeometry(0.7, 32, 32);
+    const neptuneGeometry = new THREE.SphereGeometry(1.1, 32, 32);
 
     neptuneMaterial = new THREE.MeshPhongMaterial({ color: 0x000080});
     const neptune = new THREE.Mesh(neptuneGeometry, neptuneMaterial);
@@ -32,7 +32,7 @@ export function createNeptune(scene)
 
     return {
         mesh: neptune,
-        orbitRadius: 30, // Расстояние от Солнца (орбитальный радиус)
+        orbitRadius: 75, // Расстояние от Солнца (орбитальный радиус)
         orbitSpeed: 0.00061, // Скорость орбиты (ускоренная для визуального эффекта)
         rotationSpeed: 0.008 // Скорость вращения Земли вокруг своей оси
     };

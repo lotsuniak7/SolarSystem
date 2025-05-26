@@ -4,7 +4,8 @@ const textureLoader = new THREE.TextureLoader();
 
 export function createMoon(scene) {
     let moonMaterial;
-    const moonGeometry = new THREE.SphereGeometry(0.125, 32, 32);
+    // Увеличиваем размер Луны в 2.5 раза и улучшаем качество
+    const moonGeometry = new THREE.SphereGeometry(0.31, 64, 64); // Больше сегментов для лучшего качества
 
     moonMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff }); // Синий цвет для теста
     const moon = new THREE.Mesh(moonGeometry, moonMaterial);
@@ -31,8 +32,8 @@ export function createMoon(scene) {
     // Возвращаем параметры Луны
     return {
         mesh: moon,
-        orbitRadius: 1.5, // Расстояние от Земли (в масштабе твоей сцены)
-        orbitSpeed: 0.01, // Скорость орбиты вокруг Земли (ускоренная, реальный период — 27.3 дня)
+        orbitRadius: 3.75, // Увеличили орбиту относительно Земли в 2.5 раза
+        orbitSpeed: 0.08, // Немного уменьшили скорость
         rotationSpeed: 0.005 // Скорость вращения Луны вокруг своей оси (ускоренная)
     };
 }

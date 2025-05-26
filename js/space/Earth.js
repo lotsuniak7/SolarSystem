@@ -5,7 +5,8 @@ const textureLoader = new THREE.TextureLoader();
 export function createEarth(scene)
 {
     let earthMaterial, cloudsMaterial, lightsMaterial;
-    const earthGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+    // Увеличиваем размер Земли в 2.5 раза и улучшаем качество
+    const earthGeometry = new THREE.SphereGeometry(1.8, 64, 64); // Больше сегментов для лучшего качества
 
     // Группа для объединения земли, фонарей, облаков
     const earthGroup = new THREE.Group();
@@ -37,11 +38,11 @@ export function createEarth(scene)
     cloudsMaterial = new THREE.MeshStandardMaterial({
         map: textureLoader.load("../textures/earth_clouds.jpg"),
         transparent: true,
-        opacity: 0.8,
+        opacity: 1,
         alphaMap: textureLoader.load("../textures/earth_clouds.jpg"),
     });
     const cloudsMesh = new THREE.Mesh(earthGeometry, cloudsMaterial);
-    cloudsMesh.scale.setScalar(1.003); // Чуть больше радиус для облаков
+    cloudsMesh.scale.setScalar(1.03); // Чуть больше радиус для облаков
     cloudsMesh.castShadow = true;
     cloudsMesh.receiveShadow = true;
     cloudsMesh.renderOrder = 2; // Поверх Земли и ночного слоя
@@ -50,8 +51,6 @@ export function createEarth(scene)
     lightsMaterial = new THREE.MeshBasicMaterial({
         map: textureLoader.load('../textures/earth_nightmap.jpg'), // Текстура ночных огней
         blending: THREE.AdditiveBlending,
-        transparent: true,
-        opacity: 0.8,
     });
     const lightsMesh = new THREE.Mesh(earthGeometry, lightsMaterial);
     lightsMesh.renderOrder = 1;
@@ -65,11 +64,10 @@ export function createEarth(scene)
 
     earthGroup.userData = { name: 'earth' };
 
-
     return {
         mesh: earthGroup,
-        orbitRadius: 16,
-        orbitSpeed: 0.1,
+        orbitRadius: 40, // Увеличили орбиту в 2.5 раза
+        orbitSpeed: 0.08, // Немного уменьшили скорость для более реалистичного движения
         rotationSpeed: 0.01
     };
 }

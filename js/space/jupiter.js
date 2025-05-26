@@ -5,7 +5,7 @@ const textureLoader = new THREE.TextureLoader();
 export function createJupiter(scene)
 {
     let jupiterMaterial;
-    const jupiterGeometry = new THREE.SphereGeometry(1.2, 32, 32); // Радиус Земли меньше Солнца
+    const jupiterGeometry = new THREE.SphereGeometry(2.75, 32, 32); // Радиус Земли меньше Солнца
 
     // Временный материал до загрузки текстуры
     jupiterMaterial = new THREE.MeshPhongMaterial({ color: 0xDAA520 });
@@ -35,7 +35,7 @@ export function createJupiter(scene)
 
     return {
         mesh: jupiter,
-        orbitRadius: 22, // Расстояние от Солнца (орбитальный радиус)
+        orbitRadius: 55, // Расстояние от Солнца (орбитальный радиус)
         orbitSpeed: 0.0084, // Скорость орбиты (ускоренная для визуального эффекта)
         rotationSpeed: 0.015 // Скорость вращения вокруг своей оси
     };

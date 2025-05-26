@@ -5,7 +5,7 @@ const textureLoader = new THREE.TextureLoader();
 export function createSaturn(scene)
 {
     let saturnMaterial;
-    const saturnGeometry = new THREE.SphereGeometry(1, 32, 32);
+    const saturnGeometry = new THREE.SphereGeometry(2.25, 32, 32);
 
     // Временный материал до загрузки текстуры
     saturnMaterial = new THREE.MeshPhongMaterial({ color: 0xF4A460 });
@@ -57,7 +57,7 @@ export function createSaturn(scene)
 
     return {
         mesh: saturn,
-        orbitRadius: 26, // Расстояние от Солнца (орбитальный радиус)
+        orbitRadius: 65, // Расстояние от Солнца (орбитальный радиус)
         orbitSpeed: 0.0034, // Скорость орбиты (ускоренная для визуального эффекта)
         rotationSpeed: 0.012 // Скорость вращения вокруг своей оси
     };
