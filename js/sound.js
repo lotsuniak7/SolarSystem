@@ -53,10 +53,11 @@ export function initSound() {
         }
     }
 
+
     return {
         //playSpace: () => spaceAudio.play(),
         //pauseSpace: () => spaceAudio.pause(),
         setSpaceVolume: (volume) => (spaceAudio.volume = volume),
-        toggleSun: toggleSunSound // Экспортируем функцию для звука Солнца
+        toggleSun: toggleSunSound, // Экспортируем функцию для звука Солнца
     };
 }
