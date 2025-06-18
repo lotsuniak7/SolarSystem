@@ -53,6 +53,9 @@ export function createSaturn(scene)
 
     saturn.rotation.z = 0;
 
+    saturn.userData = { name: 'saturn' };
+
+
     scene.add(saturn);
 
     return {

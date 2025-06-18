@@ -28,6 +28,7 @@ export function createVenus(scene) {
     console.log('Finished Venus texture load attempt');
 
     venus.rotation.z = 0;
+    venus.userData = { name: 'venus' };
     scene.add(venus);
 
     return {

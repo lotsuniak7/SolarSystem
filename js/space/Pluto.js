@@ -29,6 +29,8 @@ export function createPluto(scene)
 
     pluto.rotation.z = 0;
 
+    pluto.userData = { name: 'pluto' };
+
     scene.add(pluto);
 
     return {

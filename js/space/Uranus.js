@@ -53,6 +53,8 @@ export function createUranus(scene)
 
     uranus.rotation.z = 0;
 
+    uranus.userData = { name: 'uranus' };
+
     scene.add(uranus);
 
     return {

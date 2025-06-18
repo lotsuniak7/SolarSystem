@@ -1,5 +1,499 @@
-*{
+/* Global Styles */
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    overflow: hidden;
+    background: #000;
+    color: #fff;
+}
+
+canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* UI Container */
+#ui-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+/* UI Panels */
+.ui-panel {
+    position: absolute;
+    background: rgba(0, 20, 40, 0.9);
+    border: 2px solid #00ffff;
+    border-radius: 15px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+    pointer-events: auto;
+    transition: all 0.3s ease;
+}
+
+.ui-panel:hover {
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.5);
+}
+
+/* Planet Navigation Panel */
+#planet-nav {
+    top: 20px;
+    left: 20px;
+    width: 280px;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+#planet-nav h3 {
+    color: #00ffff;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 1.4em;
+    text-shadow: 0 0 10px #00ffff;
+}
+
+#planet-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.planet-btn {
+    padding: 12px 16px;
+    background: linear-gradient(135deg, rgba(0, 50, 100, 0.8), rgba(0, 30, 60, 0.8));
+    border: 1px solid #00ffff;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1em;
+    font-weight: bold;
+    text-align: left;
+}
+
+.planet-btn:hover {
+    background: linear-gradient(135deg, rgba(0, 100, 150, 0.9), rgba(0, 50, 100, 0.9));
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    transform: translateX(5px);
+}
+
+.planet-btn.active {
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.3), rgba(0, 150, 200, 0.3));
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.7);
+}
+
+/* Satellites Panel */
+#satellites-panel {
+    top: 20px;
+    left: 320px;
+    width: 220px;
+    max-height: 300px;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+#satellites-panel.show {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#satellites-panel h3 {
+    color: #00ffff;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 1.2em;
+    text-shadow: 0 0 10px #00ffff;
+}
+
+.satellite-btn {
+    width: 100%;
+    padding: 10px 12px;
+    background: linear-gradient(135deg, rgba(100, 50, 0, 0.8), rgba(80, 30, 0, 0.8));
+    border: 1px solid #ffaa00;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9em;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.satellite-btn:hover {
+    background: linear-gradient(135deg, rgba(150, 100, 0, 0.9), rgba(120, 50, 0, 0.9));
+    box-shadow: 0 0 15px rgba(255, 170, 0, 0.5);
+    transform: translateX(3px);
+}
+
+.satellite-btn.active {
+    background: linear-gradient(135deg, rgba(255, 170, 0, 0.3), rgba(200, 100, 0, 0.3));
+    box-shadow: 0 0 20px rgba(255, 170, 0, 0.7);
+}
+
+/* Planet Info Panel */
+#planet-info {
+    top: 20px;
+    right: 20px;
+    width: 400px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+#planet-info.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+#planet-info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #00ffff;
+    padding-bottom: 10px;
+}
+
+#planet-name {
+    color: #00ffff;
+    font-size: 1.6em;
+    text-shadow: 0 0 10px #00ffff;
+}
+
+.close-btn {
+    background: none;
+    border: 1px solid #ff4444;
+    color: #ff4444;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2em;
+    transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+    background: rgba(255, 68, 68, 0.2);
+    box-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+}
+
+#planet-info-content {
+    line-height: 1.6;
+}
+
+.info-section {
+    margin-bottom: 20px;
+}
+
+.info-section h4 {
+    color: #00ffff;
+    margin-bottom: 8px;
+    font-size: 1.1em;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.info-item {
+    background: rgba(0, 50, 100, 0.3);
+    padding: 8px;
+    border-radius: 5px;
+    border-left: 3px solid #00ffff;
+}
+
+.info-item strong {
+    color: #00ffff;
+    display: block;
+    font-size: 0.9em;
+}
+
+.description {
+    background: rgba(0, 30, 60, 0.5);
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #00ffff;
+    margin: 15px 0;
+}
+
+.interesting-fact {
+    background: linear-gradient(135deg, rgba(255, 255, 0, 0.1), rgba(255, 200, 0, 0.1));
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #ffff00;
+    margin: 15px 0;
+}
+
+.interesting-fact h4 {
+    color: #ffff00;
+}
+
+/* Controls Panel */
+#controls-panel {
+    bottom: 20px;
+    left: 20px;
+    width: 280px;
+}
+
+#controls-panel h3 {
+    color: #00ffff;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 1.2em;
+    text-shadow: 0 0 10px #00ffff;
+}
+
+.control-group {
+    margin-bottom: 15px;
+}
+
+.control-btn {
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(135deg, rgba(0, 50, 100, 0.8), rgba(0, 30, 60, 0.8));
+    border: 1px solid #00ffff;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+}
+
+.control-btn:hover {
+    background: linear-gradient(135deg, rgba(0, 100, 150, 0.9), rgba(0, 50, 100, 0.9));
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.control-btn.active {
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.3), rgba(0, 150, 200, 0.3));
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+}
+
+.control-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #00ffff;
+    font-size: 0.9em;
+}
+
+#animation-speed {
+    width: 70%;
+    margin-right: 10px;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    background: rgba(0, 255, 255, 0.3);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+}
+
+#animation-speed::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #00ffff;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+#animation-speed::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: #00ffff;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+#speed-value {
+    color: #00ffff;
+    font-weight: bold;
+}
+
+/* Toggle Button */
+.toggle-btn {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, rgba(0, 50, 100, 0.9), rgba(0, 30, 60, 0.9));
+    border: 2px solid #00ffff;
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1.5em;
+    transition: all 0.3s ease;
+    pointer-events: auto;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.toggle-btn:hover {
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.6);
+    transform: scale(1.1);
+}
+
+/* Loading Screen */
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #000011, #000033);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    transition: opacity 0.5s ease;
+}
+
+#loading-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loading-content {
+    text-align: center;
+    max-width: 400px;
+}
+
+.loading-content h1 {
+    font-size: 2.5em;
+    margin-bottom: 30px;
+    color: #00ffff;
+    text-shadow: 0 0 20px #00ffff;
+}
+
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(0, 255, 255, 0.3);
+    border-top: 4px solid #00ffff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(0, 255, 255, 0.2);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+#loading-progress {
+    height: 100%;
+    background: linear-gradient(90deg, #00ffff, #0088ff);
+    width: 0%;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px #00ffff;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #planet-nav, #controls-panel {
+        width: calc(100vw - 40px);
+        max-width: 300px;
+    }
+
+    #satellites-panel {
+        width: calc(100vw - 60px);
+        max-width: 200px;
+        left: 20px;
+        top: 350px;
+    }
+
+    #planet-info {
+        width: calc(100vw - 40px);
+        max-width: 350px;
+        right: 20px;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .ui-panel {
+        padding: 15px;
+    }
+
+    #planet-nav, #controls-panel, #planet-info, #satellites-panel {
+        width: calc(100vw - 20px);
+        left: 10px;
+        right: 10px;
+    }
+
+    #planet-info {
+        top: 10px;
+        right: 10px;
+    }
+
+    #satellites-panel {
+        top: 300px;
+    }
+}
+
+/* Hide UI when hidden */
+.ui-hidden .ui-panel {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.9);
+}
+
+.ui-hidden .toggle-btn {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Scrollbar Styling */
+.ui-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ui-panel::-webkit-scrollbar-track {
+    background: rgba(0, 50, 100, 0.3);
+    border-radius: 3px;
+}
+
+.ui-panel::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 255, 0.6);
+    border-radius: 3px;
+}
+
+.ui-panel::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 255, 0.8);
 }

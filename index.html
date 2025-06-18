@@ -1,19 +1,83 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Space</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar System Explorer</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<canvas id="canvas"></canvas>
-<audio src="./sounds/space.mp3" id="space-audio"></audio>
-<audio src="./sounds/sun-sound.mp3" id="sun-audio"></audio>
-<!--
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
--->
-<script type="module" src="js/app.js"></script>
-<script type="module" src="js/sound.js"></script>
+<canvas></canvas>
+
+<!-- Main UI Container -->
+<div id="ui-container">
+    <!-- Planet Navigation Panel -->
+    <div id="planet-nav" class="ui-panel">
+        <h3>Planets</h3>
+        <div id="planet-buttons">
+            <button class="planet-btn" data-planet="sun">☀️ Sun</button>
+            <button class="planet-btn" data-planet="mercury">☿ Mercury</button>
+            <button class="planet-btn" data-planet="venus">♀ Venus</button>
+            <button class="planet-btn" data-planet="earth">🌍 Earth</button>
+            <button class="planet-btn" data-planet="mars">♂ Mars</button>
+            <button class="planet-btn" data-planet="jupiter">♃ Jupiter</button>
+            <button class="planet-btn" data-planet="saturn">♄ Saturn</button>
+            <button class="planet-btn" data-planet="uranus">♅ Uranus</button>
+            <button class="planet-btn" data-planet="neptune">♆ Neptune</button>
+            <button class="planet-btn" data-planet="pluto">♇ Pluto</button>
+        </div>
+    </div>
+
+    <!-- Satellites Panel -->
+    <div id="satellites-panel" class="ui-panel">
+        <h3>Satellites</h3>
+        <div id="satellites-content">
+            <p>Select a planet to view its satellites</p>
+        </div>
+    </div>
+
+    <!-- Planet Info Panel -->
+    <div id="planet-info" class="ui-panel">
+        <div id="planet-info-header">
+            <h2 id="planet-name">Select a Planet</h2>
+            <button id="close-info" class="close-btn">×</button>
+        </div>
+        <div id="planet-info-content">
+            <p>Click on a planet button to see detailed information.</p>
+        </div>
+    </div>
+
+    <!-- Controls Panel -->
+    <div id="controls-panel" class="ui-panel">
+        <h3>Controls</h3>
+        <div class="control-group">
+            <button id="reset-camera" class="control-btn">🏠 Reset View</button>
+            <button id="toggle-orbits" class="control-btn">🔄 Toggle Orbits</button>
+            <button id="toggle-labels" class="control-btn">🏷️ Toggle Labels</button>
+        </div>
+        <div class="control-group">
+            <label for="animation-speed">Animation Speed:</label>
+            <input type="range" id="animation-speed" min="0" max="3" step="0.1" value="1">
+            <span id="speed-value">1x</span>
+        </div>
+    </div>
+
+    <!-- Info Toggle Button -->
+    <button id="toggle-ui" class="toggle-btn">📱</button>
+</div>
+
+<!-- Loading Screen -->
+<div id="loading-screen">
+    <div class="loading-content">
+        <h1>Solar System Explorer</h1>
+        <div class="loading-spinner"></div>
+        <p>Loading textures and models...</p>
+        <div class="loading-bar">
+            <div id="loading-progress"></div>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="./js/app.js"></script>
 </body>
 </html>

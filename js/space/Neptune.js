@@ -28,6 +28,9 @@ export function createNeptune(scene)
 
     neptune.rotation.z = 0;
 
+    neptune.userData = { name: 'neptune' };
+
+
     scene.add(neptune);
 
     return {

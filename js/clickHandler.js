@@ -1,8 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { PlanetInfoDisplay, getPlanetNameFromObject } from './planetInfoDisplay.js';
 
-export function initClickHandler(celestialObjects, camera, scene, controls, renderer)
+export function initClickHandler(celestialObjects, camera, scene, controls, renderer, uiManager = null)
 {
     // Raycaster для определения кликов
     const raycaster = new THREE.Raycaster();
@@ -10,9 +9,7 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
     let selectedObject = null;
     let isFollowingPlanet = false;
     let isRotatingPlanet = false;
-
-    // Система отображения информации
-    const infoDisplay = new PlanetInfoDisplay(scene, camera);
+    let labelsVisible = true; // Состояние видимости labels
 
     // Камера для крупного плана
     let closeUpCamera = null;
@@ -27,18 +24,129 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
 
     // Система подсветки
     let hoveredObject = null;
+    let hoveredPlanetName = null;
     const outlineObjects = new Map();
-    let animationFrameId = null; // Для отслеживания анимаций
+
+    // Создаем HTML элемент для отображения названия планеты
+    const planetLabel = document.createElement('div');
+    planetLabel.id = 'planet-label';
+    planetLabel.style.position = 'absolute';
+    planetLabel.style.color = 'white';
+    planetLabel.style.fontFamily = 'Arial, sans-serif';
+    planetLabel.style.fontSize = '16px';
+    planetLabel.style.fontWeight = 'bold';
+    planetLabel.style.padding = '6px 12px';
+    planetLabel.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    planetLabel.style.borderRadius = '15px';
+    planetLabel.style.border = '1px solid #00ffff';
+    planetLabel.style.pointerEvents = 'none';
+    planetLabel.style.display = 'none';
+    planetLabel.style.transform = 'translate(-50%, -100%)';
+    planetLabel.style.textShadow = '0 0 5px #00ffff';
+    planetLabel.style.zIndex = '999';
+    planetLabel.style.userSelect = 'none';
+    planetLabel.style.whiteSpace = 'nowrap';
+    document.body.appendChild(planetLabel);
+
+    // Функция для получения читаемого названия планеты
+    function getPlanetDisplayName(planetName) {
+        const displayNames = {
+            'sun': 'Sun',
+            'mercury': 'Mercury',
+            'venus': 'Venus',
+            'earth': 'Earth',
+            'mars': 'Mars',
+            'jupiter': 'Jupiter',
+            'saturn': 'Saturn',
+            'uranus': 'Uranus',
+            'neptune': 'Neptune',
+            'pluto': 'Pluto',
+            'moon': 'Moon'
+        };
+        return displayNames[planetName.toLowerCase()] || planetName;
+    }
+
+    // Функция для получения имени планеты из объекта
+    function getPlanetNameFromObject(object) {
+        // Сначала проверяем userData у самого объекта
+        if (object.userData && object.userData.name) {
+            return object.userData.name;
+        }
+
+        // Проверяем родительские объекты (для групп как Earth)
+        let currentObject = object.parent;
+        while (currentObject) {
+            if (currentObject.userData && currentObject.userData.name) {
+                return currentObject.userData.name;
+            }
+            currentObject = currentObject.parent;
+        }
+
+        // Fallback: определяем по позиции в массиве celestialObjects
+        const index = celestialObjects.indexOf(object);
+        if (index !== -1) {
+            const planetNames = ['sun', 'earth', 'moon', 'venus', 'mercury', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'];
+            return planetNames[index] || null;
+        }
+
+        // Последний fallback: определяем по размеру и позиции
+        if (object.isMesh && object.geometry && object.geometry.parameters) {
+            const radius = object.geometry.parameters.radius;
+            const position = object.position;
+            const distance = position.length();
+
+            // Сначала по размеру (более надежно)
+            if (radius > 4.5) return 'sun';
+            if (radius > 2.5) return 'jupiter';
+            if (radius > 2.3) return 'saturn';
+            if (radius > 1.6) return 'earth';
+            if (radius > 1.4) return 'venus';
+            if (radius > 0.8) return 'mars';
+            if (radius > 0.6) return 'mercury';
+            if (radius > 0.5) return 'uranus';
+            if (radius > 0.4) return 'neptune';
+            if (radius > 0.3) return 'moon';
+            return 'pluto';
+        }
+
+        return null;
+    }
+
+    // Функция для обновления позиции label
+    function updateLabelPosition(object) {
+        if (!object || !planetLabel || !labelsVisible) return;
+
+        const worldPosition = new THREE.Vector3();
+        object.getWorldPosition(worldPosition);
+
+        let offset = 2;
+        if (object.isMesh && object.geometry && object.geometry.parameters && object.geometry.parameters.radius) {
+            offset = object.geometry.parameters.radius * 1.5;
+        } else if (object.isGroup || object.children) {
+            const box = new THREE.Box3().setFromObject(object);
+            const size = box.getSize(new THREE.Vector3());
+            offset = Math.max(size.x, size.y, size.z) * 0.75;
+        }
+
+        worldPosition.y += offset;
+        const screenPosition = worldPosition.project(currentCamera);
+
+        if (screenPosition.z > 1) return;
+
+        const x = (screenPosition.x * 0.5 + 0.5) * window.innerWidth;
+        const y = (1 - (screenPosition.y * 0.5 + 0.5)) * window.innerHeight;
+
+        planetLabel.style.left = x + 'px';
+        planetLabel.style.top = (y - 10) + 'px';
+    }
 
     // Создание outline эффекта
     function createOutlineEffect(targetObject) {
         const outlines = [];
 
-        // Функция для обработки одного меша
         function createOutlineForMesh(mesh, localTransform) {
             if (!mesh.visible || !mesh.geometry) return null;
 
-            // Пропускаем специальные объекты
             if (mesh.name === 'outline_mesh' ||
                 mesh.geometry instanceof THREE.RingGeometry ||
                 (mesh.material.transparent && mesh.material.opacity < 0.5)) {
@@ -46,10 +154,7 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
             }
 
             try {
-                // Клонируем геометрию
                 const geometry = mesh.geometry.clone();
-
-                // Создаем материал для outline
                 const material = new THREE.MeshBasicMaterial({
                     color: 0xffffff,
                     side: THREE.BackSide,
@@ -61,7 +166,6 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
                 const outlineMesh = new THREE.Mesh(geometry, material);
                 outlineMesh.name = 'outline_mesh';
 
-                // Применяем локальные трансформации если есть
                 if (localTransform) {
                     outlineMesh.position.copy(localTransform.position);
                     outlineMesh.rotation.copy(localTransform.rotation);
@@ -71,10 +175,7 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
                     outlineMesh.scale.multiplyScalar(1.1);
                 }
 
-                // Устанавливаем renderOrder
                 outlineMesh.renderOrder = -1;
-
-                // Сохраняем информацию об оригинальном меше
                 outlineMesh.userData.originalMesh = mesh;
                 outlineMesh.userData.isMainMesh = mesh === targetObject;
 
@@ -85,13 +186,10 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
             }
         }
 
-        // Обрабатываем целевой объект
         if (targetObject.isMesh) {
-            // Простой меш (большинство планет)
             const outline = createOutlineForMesh(targetObject);
             if (outline) outlines.push(outline);
         } else if (targetObject.isGroup) {
-            // Группа (например, Земля)
             targetObject.traverse((child) => {
                 if (child.isMesh && child !== targetObject) {
                     const outline = createOutlineForMesh(child, {
@@ -115,19 +213,15 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
             const outlines = createOutlineEffect(object);
 
             if (outlines.length > 0) {
-                // Создаем группу для outline
                 const outlineGroup = new THREE.Group();
                 outlineGroup.name = 'outline_group';
 
-                // Добавляем все outline меши в группу
                 outlines.forEach(outline => {
                     outlineGroup.add(outline);
                 });
 
-                // Добавляем группу в сцену
                 scene.add(outlineGroup);
 
-                // Сохраняем в map
                 outlineObjects.set(object, {
                     group: outlineGroup,
                     outlines: outlines,
@@ -135,7 +229,6 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
                     targetObject: object
                 });
 
-                // Анимация появления
                 outlines.forEach(outline => {
                     outline.material.opacity = 0;
                 });
@@ -173,12 +266,10 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
 
         const { group, outlines, fadeAnimation } = data;
 
-        // Отменяем текущую анимацию
         if (fadeAnimation) {
             cancelAnimationFrame(fadeAnimation);
         }
 
-        // Анимация исчезновения
         const fadeOut = () => {
             let allComplete = true;
             let allInvisible = true;
@@ -194,15 +285,11 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
             });
 
             if (allInvisible) {
-                // Удаляем группу из сцены
                 scene.remove(group);
-
-                // Очищаем ресурсы
                 outlines.forEach(outline => {
                     if (outline.geometry) outline.geometry.dispose();
                     if (outline.material) outline.material.dispose();
                 });
-
                 outlineObjects.delete(object);
             } else if (!allComplete) {
                 requestAnimationFrame(fadeOut);
@@ -215,15 +302,15 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
     // Обработчик движения мыши для hover эффекта
     let mouseTimer = null;
     function onMouseMoveHover(event) {
-        // Не показываем hover, если планета уже выбрана
-        if (isRotatingPlanet || isFollowingPlanet) return;
+        // Если мы в режиме просмотра планеты - НЕ обрабатываем hover
+        if (isRotatingPlanet || isFollowingPlanet) {
+            return; // Просто выходим, не меняем hover состояние
+        }
 
-        // Очищаем предыдущий таймер
         if (mouseTimer) {
             clearTimeout(mouseTimer);
         }
 
-        // Добавляем небольшую задержку для стабильности
         mouseTimer = setTimeout(() => {
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -234,10 +321,8 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
             if (intersects.length > 0) {
                 let targetObject = intersects[0].object;
 
-                // Пропускаем outline меши
                 if (targetObject.name === 'outline_mesh') return;
 
-                // Находим корневой объект планеты
                 let foundObject = null;
                 let current = targetObject;
 
@@ -251,30 +336,45 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
 
                 if (!foundObject) return;
 
-                // Если это новый объект
                 if (hoveredObject !== foundObject) {
-                    // Убираем подсветку с предыдущего
                     if (hoveredObject) {
                         hideOutline(hoveredObject);
+                        if (hoveredPlanetName && uiManager) {
+                            uiManager.onPlanetUnhovered(hoveredPlanetName);
+                        }
                     }
 
-                    // Добавляем подсветку на новый
                     hoveredObject = foundObject;
+                    hoveredPlanetName = getPlanetNameFromObject(foundObject);
+
                     showOutline(hoveredObject);
                     renderer.domElement.style.cursor = 'pointer';
+
+                    if (hoveredPlanetName && labelsVisible) {
+                        planetLabel.textContent = getPlanetDisplayName(hoveredPlanetName);
+                        planetLabel.style.display = 'block';
+                        updateLabelPosition(hoveredObject);
+
+                        if (uiManager) {
+                            uiManager.onPlanetHovered(hoveredPlanetName);
+                        }
+                    }
                 }
             } else {
-                // Курсор не над планетой
                 if (hoveredObject) {
                     hideOutline(hoveredObject);
+                    if (hoveredPlanetName && uiManager) {
+                        uiManager.onPlanetUnhovered(hoveredPlanetName);
+                    }
                     hoveredObject = null;
+                    hoveredPlanetName = null;
                     renderer.domElement.style.cursor = 'default';
+                    planetLabel.style.display = 'none';
                 }
             }
-        }, 10); // 10ms задержка для стабильности
+        }, 10);
     }
 
-    // Добавляем обработчик движения мыши
     window.addEventListener('mousemove', onMouseMoveHover);
 
     function createCloseUpCamera(targetObject) {
@@ -287,11 +387,11 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
 
         let objectSize = 1;
 
-        // Определяем размер объекта
         if (targetObject.userData && targetObject.userData.name === 'earth') {
             objectSize = 1.8;
+        } else if (targetObject.geometry && targetObject.geometry.parameters) {
+            objectSize = targetObject.geometry.parameters.radius || 1;
         } else {
-            // Используем bounding box для определения размера
             const box = new THREE.Box3().setFromObject(targetObject);
             const size = box.getSize(new THREE.Vector3());
             objectSize = Math.max(size.x, size.y, size.z) / 2;
@@ -304,50 +404,131 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
         closeUpCamera.position.z += objectSize * 5;
         closeUpCamera.lookAt(worldPosition);
 
+        // Создаем OrbitControls для closeUpCamera
         closeUpControls = new OrbitControls(closeUpCamera, renderer.domElement);
-        closeUpControls.enabled = false;
+        closeUpControls.enabled = true; // Включаем контролы
         closeUpControls.target.copy(worldPosition);
         closeUpControls.enableDamping = true;
         closeUpControls.dampingFactor = 0.05;
-        closeUpControls.minDistance = objectSize * 3;
-        closeUpControls.maxDistance = objectSize * 15;
+        closeUpControls.minDistance = objectSize * 2;
+        closeUpControls.maxDistance = objectSize * 20;
+
+        // Отключаем основные контролы
+        controls.enabled = false;
+
+        console.log(`Created close-up camera for object at:`, worldPosition);
     }
 
-    // Обработчики для вращения планеты мышью
-    function onMouseDown(event) {
-        if (!isRotatingPlanet || !selectedObject) return;
+    // Функция для фокусировки на планете по имени
+    function focusOnPlanet(planetName) {
+        console.log(`Trying to focus on: ${planetName}`);
 
-        isDragging = true;
-        hasDragged = false;
-        previousMousePosition = {
-            x: event.clientX,
-            y: event.clientY
-        };
+        const targetObject = celestialObjects.find(obj => {
+            const objName = getPlanetNameFromObject(obj);
+            console.log(`Checking object with name: ${objName}`);
+            return objName && objName.toLowerCase() === planetName.toLowerCase();
+        });
+
+        console.log(`Found target object:`, targetObject);
+
+        if (targetObject) {
+            // Убираем hover подсветку
+            if (hoveredObject) {
+                hideOutline(hoveredObject);
+                hoveredObject = null;
+                planetLabel.style.display = 'none';
+            }
+
+            selectedObject = targetObject;
+            isRotatingPlanet = true;
+            isFollowingPlanet = false;
+            controls.enabled = false;
+
+            createCloseUpCamera(targetObject);
+            currentCamera = closeUpCamera;
+
+            console.log(`Successfully focused on ${planetName}`);
+            return true;
+        } else {
+            console.warn(`Could not find planet: ${planetName}`);
+            return false;
+        }
+    }
+
+    // Прямой метод фокусировки на объекте
+    function directFocusOnObject(targetObject, planetName) {
+        console.log(`ClickHandler: Direct focus on object for ${planetName}:`, targetObject);
+
+        if (targetObject) {
+            // Убираем hover подсветку
+            if (hoveredObject) {
+                hideOutline(hoveredObject);
+                hoveredObject = null;
+                planetLabel.style.display = 'none';
+            }
+
+            selectedObject = targetObject;
+            isRotatingPlanet = true;
+            isFollowingPlanet = false;
+            controls.enabled = false;
+
+            createCloseUpCamera(targetObject);
+            currentCamera = closeUpCamera;
+
+            console.log(`ClickHandler: Successfully focused on ${planetName}`);
+            return true;
+        }
+        return false;
+    }
+
+    // Функция сброса камеры
+    function resetCamera() {
+        isFollowingPlanet = false;
+        isRotatingPlanet = false;
+        selectedObject = null;
+
+        // Отключаем closeUpControls и включаем основные
+        if (closeUpControls) {
+            closeUpControls.dispose();
+            closeUpControls = null;
+        }
+        closeUpCamera = null;
+
+        // Включаем основные контролы и устанавливаем основную камеру
+        controls.enabled = true;
+        currentCamera = camera;
+
+        // Возвращаем камеру в исходное положение
+        camera.position.set(0, 75, 125);
+        camera.lookAt(0, 0, 0);
+        controls.update();
+
+        renderer.domElement.style.cursor = 'default';
+        console.log('Camera reset to overview');
+    }
+
+    // Функция для установки видимости labels
+    function setLabelsVisible(visible) {
+        labelsVisible = visible;
+        if (!visible && planetLabel) {
+            planetLabel.style.display = 'none';
+        }
+    }
+
+    // Обработчики для вращения планеты мышью (отключены)
+    function onMouseDown(event) {
+        // Ничего не делаем - пусть OrbitControls обрабатывает
+        return;
     }
 
     function onMouseMove(event) {
-        if (!isDragging || !isRotatingPlanet || !selectedObject) return;
-
-        const deltaMove = {
-            x: event.clientX - previousMousePosition.x,
-            y: event.clientY - previousMousePosition.y
-        };
-
-        if (Math.abs(deltaMove.x) > 2 || Math.abs(deltaMove.y) > 2) {
-            hasDragged = true;
-        }
-
-        selectedObject.rotation.y += deltaMove.x * rotationSpeed;
-        selectedObject.rotation.x += deltaMove.y * rotationSpeed;
-
-        previousMousePosition = {
-            x: event.clientX,
-            y: event.clientY
-        };
+        // Ничего не делаем - пусть OrbitControls обрабатывает
+        return;
     }
 
     function onMouseUp() {
-        isDragging = false;
+        // Ничего не делаем - пусть OrbitControls обрабатывает
+        return;
     }
 
     window.addEventListener('mousedown', onMouseDown);
@@ -356,11 +537,7 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
 
     // Основной обработчик кликов
     window.addEventListener('click', (event) => {
-        if (hasDragged) {
-            hasDragged = false;
-            return;
-        }
-
+        // Если мы в режиме просмотра планеты
         if (isRotatingPlanet || isFollowingPlanet) {
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -368,28 +545,18 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
             raycaster.setFromCamera(mouse, currentCamera);
             const intersects = raycaster.intersectObjects(celestialObjects, true);
 
+            // Выходим только если кликнули ДАЛЕКО от планеты (в пустоту)
             if (intersects.length === 0) {
-                // Выход из режима просмотра
-                isFollowingPlanet = false;
-                isRotatingPlanet = false;
-                selectedObject = null;
-                controls.enabled = true;
-                currentCamera = camera;
-
-                infoDisplay.hidePlanetInfo();
-
-                if (closeUpControls) {
-                    closeUpControls.dispose();
-                    closeUpControls = null;
+                resetCamera();
+                if (uiManager) {
+                    uiManager.hidePlanetInfo();
                 }
-                closeUpCamera = null;
-
-                renderer.domElement.style.cursor = 'default';
-                console.log('Returned to main camera');
             }
+            // Если кликнули на планету - НЕ выходим из режима просмотра
             return;
         }
 
+        // Обычный режим - обрабатываем клики на планеты
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
@@ -399,10 +566,8 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
         if (intersects.length > 0) {
             let targetObject = intersects[0].object;
 
-            // Пропускаем outline меши
             if (targetObject.name === 'outline_mesh') return;
 
-            // Находим корневой объект планеты
             let foundObject = null;
             let current = targetObject;
 
@@ -416,28 +581,11 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
 
             if (!foundObject) return;
 
-            // Убираем hover подсветку
-            if (hoveredObject) {
-                hideOutline(hoveredObject);
-                hoveredObject = null;
-            }
-
-            selectedObject = foundObject;
-            isRotatingPlanet = true;
-            isFollowingPlanet = false;
-            controls.enabled = false;
-
             const planetName = getPlanetNameFromObject(foundObject);
-            if (planetName) {
-                const worldPosition = new THREE.Vector3();
-                foundObject.getWorldPosition(worldPosition);
-                infoDisplay.showPlanetInfo(planetName, worldPosition);
+            if (planetName && uiManager) {
+                directFocusOnObject(foundObject, planetName);
+                uiManager.onPlanetClicked(planetName);
             }
-
-            createCloseUpCamera(foundObject);
-            currentCamera = closeUpCamera;
-
-            console.log('Planet rotation mode enabled for:', selectedObject);
         }
     });
 
@@ -445,35 +593,24 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
     window.addEventListener('keydown', (event) => {
         switch(event.code) {
             case 'KeyI':
-                if (selectedObject) {
-                    if (infoDisplay.isInfoVisible()) {
-                        infoDisplay.hidePlanetInfo();
-                    } else {
-                        const planetName = getPlanetNameFromObject(selectedObject);
-                        if (planetName) {
-                            const worldPosition = new THREE.Vector3();
-                            selectedObject.getWorldPosition(worldPosition);
-                            infoDisplay.showPlanetInfo(planetName, worldPosition);
+                if (selectedObject && uiManager) {
+                    const planetName = getPlanetNameFromObject(selectedObject);
+                    if (planetName) {
+                        const uiState = uiManager.getState();
+                        if (uiState.infoVisible) {
+                            uiManager.hidePlanetInfo();
+                        } else {
+                            uiManager.onPlanetClicked(planetName);
                         }
                     }
                 }
                 break;
             case 'Escape':
                 if (isRotatingPlanet || isFollowingPlanet) {
-                    isFollowingPlanet = false;
-                    isRotatingPlanet = false;
-                    selectedObject = null;
-                    controls.enabled = true;
-                    currentCamera = camera;
-                    infoDisplay.hidePlanetInfo();
-
-                    if (closeUpControls) {
-                        closeUpControls.dispose();
-                        closeUpControls = null;
+                    resetCamera();
+                    if (uiManager) {
+                        uiManager.hidePlanetInfo();
                     }
-                    closeUpCamera = null;
-
-                    renderer.domElement.style.cursor = 'default';
                 }
                 break;
         }
@@ -493,7 +630,6 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
             clearTimeout(mouseTimer);
         }
 
-        // Удаляем все outline объекты
         outlineObjects.forEach((data, object) => {
             if (data.fadeAnimation) {
                 cancelAnimationFrame(data.fadeAnimation);
@@ -501,7 +637,10 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
             hideOutline(object);
         });
 
-        // Удаляем обработчики событий
+        if (planetLabel.parentNode) {
+            planetLabel.parentNode.removeChild(planetLabel);
+        }
+
         window.removeEventListener('mousemove', onMouseMoveHover);
         window.removeEventListener('mousedown', onMouseDown);
         window.removeEventListener('mousemove', onMouseMove);
@@ -522,30 +661,21 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
                     closeUpControls.target.copy(worldPosition);
                     closeUpControls.update();
                 }
-
-                infoDisplay.update(worldPosition);
             }
 
-            // Обновляем позиции outline для всех планет
             outlineObjects.forEach((data, object) => {
                 if (data && data.group && data.targetObject) {
-                    // Для простых мешей (большинство планет)
                     if (data.targetObject.isMesh) {
-                        // Копируем мировую матрицу целевого объекта
                         data.group.position.copy(data.targetObject.position);
                         data.group.rotation.copy(data.targetObject.rotation);
 
-                        // Обновляем масштаб каждого outline меша
                         data.outlines.forEach(outline => {
                             if (outline.userData.isMainMesh) {
                                 outline.scale.copy(data.targetObject.scale);
                                 outline.scale.multiplyScalar(1.1);
                             }
                         });
-                    }
-                    // Для групп (например, Земля)
-                    else if (data.targetObject.isGroup) {
-                        // Получаем мировую позицию группы
+                    } else if (data.targetObject.isGroup) {
                         const worldPos = new THREE.Vector3();
                         const worldRot = new THREE.Quaternion();
                         const worldScale = new THREE.Vector3();
@@ -560,11 +690,20 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
                     }
                 }
             });
+
+            // Обновляем позицию label если есть наведенный объект
+            if (hoveredObject && planetLabel.style.display !== 'none' && labelsVisible) {
+                updateLabelPosition(hoveredObject);
+            }
         },
         getCurrentCamera: () => currentCamera,
         isUsingCloseUpCamera: () => currentCamera === closeUpCamera,
         getRotationMode: () => isRotatingPlanet,
-        getInfoDisplay: () => infoDisplay,
+        focusOnPlanet: focusOnPlanet,
+        directFocusOnObject: directFocusOnObject,
+        resetCamera: resetCamera,
+        setLabelsVisible: setLabelsVisible,
+        getCurrentPlanet: () => selectedObject ? getPlanetNameFromObject(selectedObject) : null,
         cleanup: cleanup
     };
 }

@@ -26,6 +26,8 @@ export function createMoon(scene) {
     // Наклон оси Луны (5.145° для реализма, увеличим до 10° для заметности)
     moon.rotation.z = (10 * Math.PI) / 180;
 
+    moon.userData = { name: 'moon' };
+
     // Добавление Луны в сцену
     scene.add(moon);
 

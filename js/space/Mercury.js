@@ -29,6 +29,8 @@ export function createMercury(scene)
 
     mercury.rotation.z = 0;
 
+    mercury.userData = { name: 'mercury' };
+
     scene.add(mercury);
 
     return {
