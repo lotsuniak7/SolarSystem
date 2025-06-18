@@ -1,18 +1,8 @@
-// app.js - Упрощенная версия с правильной интеграцией
+// app.js - Упрощенная версия с единым создателем планет
 import {initScene} from "./initScene.js";
 import {initClickHandler} from "./clickHandler.js";
 import { UIManager } from "./uiManager.js";
-import { createSun } from './space/Sun.js';
-import { createEarth} from './space/Earth.js';
-import {createMoon} from './space/Moon.js';
-import {createVenus} from './space/Venus.js';
-import {createNeptune} from "./space/Neptune.js";
-import {createMercury} from "./space/Mercury.js";
-import {createJupiter} from "./space/jupiter.js";
-import {createMars} from "./space/Mars.js";
-import {createPluto} from "./space/Pluto.js";
-import {createSaturn} from "./space/saturn.js";
-import {createUranus} from "./space/Uranus.js";
+import { createAllPlanets } from "./createPlanets.js"; // НОВЫЙ ИМПОРТ
 import {createOrbits} from "./space/orbits.js";
 import {createStars} from "./space/Stars.js";
 import {initSound} from "./sound.js";
@@ -42,18 +32,21 @@ try {
     };
 }
 
-// Создание космических объектов
-const sun = createSun(scene);
-const earth = createEarth(scene);
-const moon = createMoon(scene);
-const venus = createVenus(scene);
-const neptune = createNeptune(scene);
-const mercury = createMercury(scene);
-const jupiter = createJupiter(scene);
-const mars = createMars(scene);
-const pluto = createPluto(scene);
-const saturn = createSaturn(scene);
-const uranus = createUranus(scene);
+// 🚀 СОЗДАНИЕ ВСЕХ ПЛАНЕТ ОДНОЙ ФУНКЦИЕЙ
+const allPlanets = createAllPlanets(scene);
+
+// Извлекаем планеты для совместимости со старым кодом
+const sun = allPlanets.sun;
+const earth = allPlanets.earth;
+const moon = allPlanets.moon;
+const venus = allPlanets.venus;
+const neptune = allPlanets.neptune;
+const mercury = allPlanets.mercury;
+const jupiter = allPlanets.jupiter;
+const mars = allPlanets.mars;
+const pluto = allPlanets.pluto;
+const saturn = allPlanets.saturn;
+const uranus = allPlanets.uranus;
 
 // Массив всех космических объектов для взаимодействия
 const celestialObjects = [
@@ -74,7 +67,7 @@ const celestialObjects = [
 const planets = [earth, venus, neptune, mercury, jupiter, mars, pluto, saturn, uranus];
 createOrbits(planets, scene);
 
-// Простой объект для animationControls (пока UIManager не ожидает сложного)
+// Простой объект для animationControls
 const simpleAnimationControls = {
     setSpeed: () => {},
     toggleOrbits: () => {},
@@ -153,7 +146,8 @@ window.solarSystemApp = {
     clickHandler,
     uiManager,
     globalAnimationController,
-    celestialObjects
+    celestialObjects,
+    allPlanets // Добавляем новый объект с планетами
 };
 
 console.log('🌟 Solar System Explorer loaded successfully!');

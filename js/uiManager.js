@@ -142,6 +142,8 @@ export class UIManager {
 
     showPlanetInfo(planetName) {
         const planetData = this.getPlanetData(planetName);
+        console.log('🐛 Debug planetData for', planetName, ':', planetData); // ОТЛАДКА
+
         if (!planetData) {
             console.warn(`No data found for planet: ${planetName}`);
             return;
@@ -224,53 +226,57 @@ export class UIManager {
         if (planetName) planetName.textContent = planetData.name;
 
         if (planetInfoContent) {
+            // Проверяем структуру данных и используем правильную
+            const info = planetData.info || planetData; // Fallback если нет info секции
+
             planetInfoContent.innerHTML = `
-                <div class="info-section">
-                    <h4>Basic Information</h4>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <strong>Name (French)</strong>
-                            ${planetData.nameInFrench}
-                        </div>
-                        <div class="info-item">
-                            <strong>Diameter</strong>
-                            ${planetData.diameter}
-                        </div>
-                        <div class="info-item">
-                            <strong>Distance to Sun</strong>
-                            ${planetData.distanceToSun}
-                        </div>
-                        <div class="info-item">
-                            <strong>Satellites</strong>
-                            ${planetData.satellites}
-                        </div>
-                        <div class="info-item">
-                            <strong>Rotation Duration</strong>
-                            ${planetData.rotationDuration}
-                        </div>
-                        <div class="info-item">
-                            <strong>Orbital Period</strong>
-                            ${planetData.orbitalPeriod}
-                        </div>
+            <div class="info-section">
+                <h4>Basic Information</h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>Name (French)</strong>
+                        ${planetData.nameInFrench || 'N/A'}
+                    </div>
+                    <div class="info-item">
+                        <strong>Diameter</strong>
+                        ${info.diameter || 'N/A'}
+                    </div>
+                    <div class="info-item">
+                        <strong>Distance to Sun</strong>
+                        ${info.distanceToSun || 'N/A'}
+                    </div>
+                    <div class="info-item">
+                        <strong>Satellites</strong>
+                        ${info.satellites || 0}
+                    </div>
+                    <div class="info-item">
+                        <strong>Rotation Duration</strong>
+                        ${info.rotationDuration || 'N/A'}
+                    </div>
+                    <div class="info-item">
+                        <strong>Orbital Period</strong>
+                        ${info.orbitalPeriod || 'N/A'}
                     </div>
                 </div>
+            </div>
 
-                <div class="info-section">
-                    <h4>Description</h4>
-                    <div class="description">
-                        ${planetData.description}
-                    </div>
+            <div class="info-section">
+                <h4>Description</h4>
+                <div class="description">
+                    ${info.description || 'No description available'}
                 </div>
+            </div>
 
-                <div class="info-section">
-                    <div class="interesting-fact">
-                        <h4>💡 Interesting Fact</h4>
-                        ${planetData.interestingFact}
-                    </div>
+            <div class="info-section">
+                <div class="interesting-fact">
+                    <h4>💡 Interesting Fact</h4>
+                    ${info.interestingFact || 'No interesting fact available'}
                 </div>
-            `;
+            </div>
+        `;
         }
     }
+
 
     getPlanetData(planetName) {
         const normalizedName = planetName.toLowerCase();
