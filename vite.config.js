@@ -15,9 +15,12 @@ export default defineConfig({
         outDir: 'dist',
         assetsDir: 'assets',
         sourcemap: true,
-        rollupOptions: {
-            external: [], // Ne pas externaliser 'three'
-        },
     },
     publicDir: 'public',
+    optimizeDeps: {
+        include: [
+            'three',  // Bundle three.js principal
+            'three/examples/jsm/controls/OrbitControls'  // Bundle OrbitControls et autres examples
+        ],
+    },
 });
