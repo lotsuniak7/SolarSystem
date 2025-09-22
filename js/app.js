@@ -1,8 +1,7 @@
-// app.js - Упрощенная версия с единым создателем планет
 import {initScene} from "./initScene.js";
 import {initClickHandler} from "./clickHandler.js";
 import { UIManager } from "./uiManager.js";
-import { createAllPlanets } from "./createPlanets.js"; // НОВЫЙ ИМПОРТ
+import { createAllPlanets } from "./createPlanets.js";
 import {createOrbits} from "./space/orbits.js";
 import {createStars} from "./space/Stars.js";
 import {initSound} from "./sound.js";

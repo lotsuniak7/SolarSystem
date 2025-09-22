@@ -128,6 +128,7 @@ export function initClickHandler(celestialObjects, camera, scene, controls, rend
             offset = Math.max(size.x, size.y, size.z) * 0.75;
         }
 
+        // Plus haut que planette
         worldPosition.y += offset;
         const screenPosition = worldPosition.project(currentCamera);
 
