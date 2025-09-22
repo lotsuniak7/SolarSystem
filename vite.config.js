@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
     root: '.',
-    base: '/', // Chemin de base pour Vercel
+    base: './', // Chemin de base pour Vercel
     server: {
         hmr: {
             host: 'localhost',
