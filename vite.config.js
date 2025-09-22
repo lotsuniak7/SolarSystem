@@ -15,12 +15,22 @@ export default defineConfig({
         outDir: 'dist',
         assetsDir: 'assets',
         sourcemap: true,
+        rollupOptions: {
+            external: [], // Assure que 'three' n'est pas externalisé
+        },
     },
     publicDir: 'public',
     optimizeDeps: {
         include: [
-            'three',  // Bundle three.js principal
-            'three/examples/jsm/controls/OrbitControls'  // Bundle OrbitControls et autres examples
+            'three',
+            'three/examples/jsm/controls/OrbitControls.js',
+            'three/examples/jsm/loaders/GLTFLoader.js', // Si utilisé
         ],
+        force: true, // Force la ré-optimisation des dépendances
+    },
+    resolve: {
+        alias: {
+            three: 'three', // Résout explicitement le module three
+        },
     },
 });
