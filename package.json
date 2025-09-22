@@ -1,0 +1,30 @@
+{
+  "name": "sunmoonearth",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --base=/",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lotsuniak7/SolarSystem.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lotsuniak7/SolarSystem/issues"
+  },
+  "homepage": "https://github.com/lotsuniak7/SolarSystem#readme",
+  "description": "",
+  "dependencies": {
+    "ngrok": "^5.0.0-beta.2",
+    "three": "^0.176.0"
+  },
+  "devDependencies": {
+    "vite": "^6.3.5"
+  }
+}

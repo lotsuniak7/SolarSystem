@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
     root: '.', // Racine du projet
-    base: '/', // Chemin de base pour Vercel/GitHub Pages
+    base: '/', // Chemin de base pour Vercel
     server: {
         hmr: {
             host: 'localhost',
@@ -12,9 +12,9 @@ export default defineConfig({
         allowedHosts: ['.ngrok-free.app'],
     },
     build: {
-        outDir: 'dist', // Dossier de sortie pour le build
-        assetsDir: 'assets', // Dossier pour les assets bundlés
-        sourcemap: true, // Utile pour déboguer
+        outDir: 'dist', // Dossier de sortie
+        assetsDir: 'assets', // Dossier pour les assets
+        sourcemap: true, // Pour débogage
     },
-    publicDir: 'public', // Dossier pour les fichiers statiques (textures)
+    publicDir: 'public', // Dossier pour les textures
 });
