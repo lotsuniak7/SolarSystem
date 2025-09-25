@@ -6,7 +6,7 @@ export default {
     "3d": {
       "radius": 5,
       "segments": 32,
-      "texture": "../textures/sun.jpg",
+      "texture": "/textures/sun.jpg",
       "material": "MeshBasicMaterial",
       "orbitRadius": 0,
       "orbitSpeed": 0,
@@ -35,7 +35,7 @@ export default {
     "3d": {
       "radius": 0.6,
       "segments": 32,
-      "texture": "../textures/mercury.jpg",
+      "texture": "/textures/mercury.jpg",
       "material": "MeshPhongMaterial",
       "orbitRadius": 25,
       "orbitSpeed": 0.2,
@@ -62,7 +62,7 @@ export default {
     "3d": {
       "radius": 1.2,
       "segments": 32,
-      "texture": "../textures/venus.jpg",
+      "texture": "/textures/venus.jpg",
       "material": "MeshPhongMaterial",
       "orbitRadius": 35,
       "orbitSpeed": 0.12,
@@ -89,7 +89,7 @@ export default {
     "3d": {
       "radius": 1.8,
       "segments": 64,
-      "texture": "../textures/earth.jpg",
+      "texture": "/textures/earth.jpg",
       "material": "MeshPhongMaterial",
       "orbitRadius": 40,
       "orbitSpeed": 0.08,
@@ -102,15 +102,15 @@ export default {
       "layers": [
         {
           "type": "clouds",
-          "texture": "../textures/earth_clouds.jpg",
-          "alphaMap": "../textures/earth_clouds.jpg",
+          "texture": "/textures/earth_clouds.jpg",
+          "alphaMap": "/textures/earth_clouds.jpg",
           "scale": 1.03,
           "opacity": 1,
           "renderOrder": 2
         },
         {
           "type": "nightLights",
-          "texture": "../textures/earth_nightmap.jpg",
+          "texture": "/textures/earth_nightmap.jpg",
           "blending": "AdditiveBlending",
           "renderOrder": 1
         }
@@ -134,7 +134,7 @@ export default {
     "3d": {
       "radius": 0.4,
       "segments": 32,
-      "texture": "../textures/moon.jpg",
+      "texture": "/textures/moon.jpg",
       "material": "MeshPhongMaterial",
       "orbitRadius": 3,
       "orbitSpeed": 2.5,
@@ -162,7 +162,7 @@ export default {
     "3d": {
       "radius": 0.675,
       "segments": 32,
-      "texture": "../textures/mars.jpg",
+      "texture": "/textures/mars.jpg",
       "material": "MeshLambertMaterial",
       "orbitRadius": 45,
       "orbitSpeed": 0.053,
@@ -189,7 +189,7 @@ export default {
     "3d": {
       "radius": 2.75,
       "segments": 32,
-      "texture": "../textures/jupiter.jpg",
+      "texture": "/textures/jupiter.jpg",
       "material": "MeshPhongMaterial",
       "orbitRadius": 55,
       "orbitSpeed": 0.0084,
@@ -216,7 +216,7 @@ export default {
     "3d": {
       "radius": 2.3,
       "segments": 32,
-      "texture": "../textures/saturn.jpg",
+      "texture": "/textures/saturn.jpg",
       "material": "MeshPhongMaterial",
       "orbitRadius": 70,
       "orbitSpeed": 0.006,
@@ -229,7 +229,7 @@ export default {
       "rings": {
         "innerRadius": 2.5,
         "outerRadius": 4.2,
-        "texture": "../textures/saturn_rings.png",
+        "texture": "/textures/saturn_rings.png",
         "opacity": 0.8
       }
     },
@@ -250,7 +250,7 @@ export default {
     "3d": {
       "radius": 1.6,
       "segments": 32,
-      "texture": "../textures/uranus.jpg",
+      "texture": "/textures/uranus.jpg",
       "material": "MeshPhongMaterial",
       "orbitRadius": 85,
       "orbitSpeed": 0.004,
@@ -277,7 +277,7 @@ export default {
     "3d": {
       "radius": 1.55,
       "segments": 32,
-      "texture": "../textures/neptune.jpg",
+      "texture": "/textures/neptune.jpg",
       "material": "MeshPhongMaterial",
       "orbitRadius": 100,
       "orbitSpeed": 0.003,
@@ -304,7 +304,7 @@ export default {
     "3d": {
       "radius": 0.3,
       "segments": 32,
-      "texture": "../textures/pluto.jpg",
+      "texture": "/textures/pluto.jpg",
       "material": "MeshPhongMaterial",
       "orbitRadius": 115,
       "orbitSpeed": 0.002,
