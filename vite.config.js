@@ -11,7 +11,7 @@ export default defineConfig({
         host: true,
         allowedHosts: ['.ngrok-free.app'],
     },
-    build: {
+    /*build: {
         outDir: 'dist',
         assetsDir: 'assets',
         sourcemap: true,
@@ -19,7 +19,7 @@ export default defineConfig({
             input: './index.html',
             //external: [], // Assure que 'three' n'est pas externalisé
         },
-    },
+    },*/
     publicDir: 'public',
     optimizeDeps: {
         include: [
