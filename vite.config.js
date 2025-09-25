@@ -1,8 +1,8 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-    root: '.', // Racine du projet
-    base: '/', // Chemin de base pour Vercel
+    root: '.',
+    base: './', // Chemin de base pour Vercel
     server: {
         hmr: {
             host: 'localhost',
@@ -12,9 +12,25 @@ export default defineConfig({
         allowedHosts: ['.ngrok-free.app'],
     },
     build: {
-        outDir: 'dist', // Dossier de sortie
-        assetsDir: 'assets', // Dossier pour les assets
-        sourcemap: true, // Pour débogage
+        outDir: 'dist',
+        assetsDir: 'assets',
+        sourcemap: true,
+        rollupOptions: {
+            external: [], // Assure que 'three' n'est pas externalisé
+        },
     },
-    publicDir: 'public', // Dossier pour les textures
+    publicDir: 'public',
+    optimizeDeps: {
+        include: [
+            'three',
+            'three/examples/jsm/controls/OrbitControls.js',
+            'three/examples/jsm/loaders/GLTFLoader.js', // Si utilisé
+        ],
+        force: true, // Force la ré-optimisation des dépendances
+    },
+    resolve: {
+        alias: {
+            three: 'three', // Résout explicitement le module three
+        },
+    },
 });
