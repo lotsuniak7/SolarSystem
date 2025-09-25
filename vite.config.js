@@ -16,7 +16,8 @@ export default defineConfig({
         assetsDir: 'assets',
         sourcemap: true,
         rollupOptions: {
-            external: [], // Assure que 'three' n'est pas externalisé
+            input: './index.html',
+            //external: [], // Assure que 'three' n'est pas externalisé
         },
     },
     publicDir: 'public',
