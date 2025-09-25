@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import planetsData from './planetsData.json';
+import planetsData from './planetsData.js';
 
 export class PlanetInfoDisplay {
     constructor(scene, camera) {

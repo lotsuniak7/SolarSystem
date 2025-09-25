@@ -1,4 +1,4 @@
-import planetsData from './planetsData.json';
+import planetsData from './planetsData.js';
 
 export class UIManager {
     constructor(clickHandler, animationControls) {

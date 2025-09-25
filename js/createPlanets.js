@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import planetsData from './planetsData.json';
+import planetsData from './planetsData.js';
 
 const textureLoader = new THREE.TextureLoader();
 
