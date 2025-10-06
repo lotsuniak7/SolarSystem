@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build --base=/",
-    "preview": "vite preview"
+    "build": "vite build && node fix-paths.js",
+    "preview": "vite preview",
+    "build:clean": "rm -rf dist && npm run build"
   },
   "repository": {
     "type": "git",
